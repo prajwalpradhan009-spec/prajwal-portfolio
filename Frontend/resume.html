@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Resume of Prajjwal Pradhan, BCA student and full-stack developer." />
+  <title>Prajjwal Pradhan | Resume</title>
+  <style>
+    :root { --ink: #10191b; --muted: #587075; --accent: #08aec4; --line: #d2e0e1; --paper: #ffffff; --wash: #f4f9f9; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--wash); color: var(--ink); font: 15px/1.6 Arial, sans-serif; }
+    .resume { width: min(850px, calc(100% - 32px)); margin: 40px auto; padding: 58px 64px; background: var(--paper); box-shadow: 0 16px 50px rgba(16, 25, 27, .08); }
+    header { display: flex; justify-content: space-between; gap: 24px; padding-bottom: 28px; border-bottom: 3px solid var(--accent); }
+    h1 { margin: 0; font-size: 42px; line-height: 1.05; letter-spacing: -1.5px; }
+    .role { margin: 8px 0 0; color: var(--accent); font-weight: 700; }
+    .contact { margin: 0; color: var(--muted); text-align: right; font-size: 13px; }
+    section { margin-top: 28px; }
+    h2 { margin: 0 0 12px; color: var(--accent); font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; }
+    h3 { margin: 0; font-size: 17px; }
+    p { margin: 5px 0 0; }
+    .muted { color: var(--muted); }
+    .item { margin-top: 16px; }
+    .item:first-of-type { margin-top: 0; }
+    .meta { display: flex; justify-content: space-between; gap: 16px; color: var(--muted); font-size: 13px; }
+    .skills { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 30px; }
+    .skill { padding: 8px 0; border-bottom: 1px solid var(--line); }
+    .actions { position: fixed; top: 18px; right: 18px; display: flex; gap: 8px; }
+    .actions a, .actions button { border: 1px solid var(--ink); background: var(--ink); color: white; padding: 9px 13px; cursor: pointer; font: 700 12px Arial, sans-serif; text-decoration: none; }
+    .actions a:first-child { background: var(--accent); border-color: var(--accent); }
+    @media print { body { background: white; } .resume { width: 100%; margin: 0; padding: 0; box-shadow: none; } .actions { display: none; } }
+    @media (max-width: 620px) { .resume { margin: 16px auto; padding: 32px 24px; } header { display: block; } .contact { margin-top: 16px; text-align: left; } h1 { font-size: 34px; } .skills { grid-template-columns: 1fr; } .actions { position: static; width: min(850px, calc(100% - 32px)); margin: 16px auto 0; } }
+  </style>
+</head>
+<body>
+  <div class="actions"><a href="#" id="resume-download">Download</a><button type="button" onclick="window.print()">Print / PDF</button></div>
+  <main class="resume">
+    <header>
+      <div><h1>Prajjwal Pradhan</h1><p class="role">BCA Student / Full-Stack Developer</p></div>
+      <p class="contact">Gangtok, Sikkim, India<br />prajjwalpradhan900@gmail.com<br />github.com/prajwalpradhan009-spec</p>
+    </header>
+    <section><h2>Profile</h2><p>I am a curious BCA student focused on building useful, scalable and user-friendly digital products. I enjoy working across frontend interfaces, backend APIs, databases and the details that make a product feel considered.</p></section>
+    <section><h2>Education</h2><div class="item"><div class="meta"><strong>Sikkim Alpine University</strong><span>2025 - Present</span></div><h3>Bachelor of Computer Applications (BCA)</h3><p class="muted">Software development, data structures, databases and modern web technologies.</p></div></section>
+    <section><h2>Technical Skills</h2><div class="skills"><div class="skill"><strong>Languages</strong><br />Python, JavaScript, TypeScript, C</div><div class="skill"><strong>Frontend</strong><br />HTML, CSS, React.js, Vite</div><div class="skill"><strong>Backend</strong><br />Node.js, Express.js, Flask, FastAPI</div><div class="skill"><strong>Data and tools</strong><br />MongoDB, Mongoose, Git, GitHub, VS Code</div></div></section>
+    <section><h2>Projects</h2><div class="item"><h3>Northstar File Studio</h3><p class="muted">Python desktop utility for merging PDFs and converting, compressing and organizing images. Built with Python, CustomTkinter and Pillow.</p></div><div class="item"><h3>Weatherly</h3><p class="muted">A calm weather dashboard using JavaScript and REST API data for quick, readable updates.</p></div><div class="item"><h3>Mindful Notes</h3><p class="muted">A focused notes space built with HTML, CSS and Firebase for collecting thoughts without distractions.</p></div></section>
+    <section><h2>Additional</h2><p>2 certifications | Available for internships, collaborations and entry-level opportunities</p></section>
+  </main>
+  <script>
+    document.querySelector('#resume-download').addEventListener('click', event => {
+      event.preventDefault();
+      const resume = document.documentElement.cloneNode(true);
+      resume.querySelector('.actions').remove();
+      const file = new Blob(['<!doctype html>\n', resume.outerHTML], { type: 'text/html' });
+      const url = URL.createObjectURL(file);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'Prajjwal-Pradhan-Resume.html';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+  </script>
+</body>
+</html>
