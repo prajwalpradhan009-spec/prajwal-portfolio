@@ -3,27 +3,26 @@ const fs = require('node:fs/promises');
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const { MongoClient } = require('mongodb');
+const mongoose = require('mongoose'); // Added Mongoose
 
+// Loads variables from .env file
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
 const mongoUri = process.env.MONGODB_URI;
-const databaseName = process.env.MONGODB_DB || 'prajjwal_portfolio';
 const contactsFile = path.join(__dirname, 'data', 'contacts.json');
-const mongoClient = mongoUri
-  ? new MongoClient(mongoUri, {
-      maxPoolSize: 10,
-      minPoolSize: 0,
-      maxIdleTimeMS: 30000,
-      connectTimeoutMS: 5000,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 30000
-    })
-  : null;
 
-let database;
+// 1. Create a Mongoose Schema and Model for your Contacts
+const contactSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  message: String,
+  createdAt: { type: Date, default: Date.now }
+});
+const Contact = mongoose.model('Contact', contactSchema);
+
+let isDatabaseConnected = false;
 
 app.use(cors());
 app.use(express.json({ limit: '16kb' }));
@@ -61,7 +60,7 @@ async function saveContactToFile(contact) {
 }
 
 app.get('/api/health', (request, response) => {
-  response.json({ status: database ? 'ok' : 'degraded', service: 'prajjwal-portfolio-api', database: Boolean(database) });
+  response.json({ status: isDatabaseConnected ? 'ok' : 'degraded', service: 'prajjwal-portfolio-api', database: isDatabaseConnected });
 });
 
 app.get('/api/projects', (request, response) => response.json(projects));
@@ -75,11 +74,12 @@ app.get('/api/projects/:slug', (request, response) => {
 app.get('/api/skills', (request, response) => response.json(skills));
 
 app.post('/api/contact', async (request, response) => {
-  const contact = validateContact(request.body);
-  if (contact.error) return response.status(400).json({ error: contact.error });
-  if (!database) {
+  const contactData = validateContact(request.body);
+  if (contactData.error) return response.status(400).json({ error: contactData.error });
+  
+  if (!isDatabaseConnected) {
     try {
-      await saveContactToFile(contact);
+      await saveContactToFile(contactData);
       return response.status(201).json({ message: 'Message received. Saved locally.' });
     } catch (error) {
       console.error('Local contact save failed:', error.message);
@@ -88,7 +88,8 @@ app.post('/api/contact', async (request, response) => {
   }
 
   try {
-    await database.collection('contacts').insertOne({ ...contact, createdAt: new Date() });
+    // 2. Use Mongoose to save the new contact to Atlas
+    await Contact.create(contactData);
     return response.status(201).json({ message: 'Message received. Thank you.' });
   } catch (error) {
     console.error('Contact insert failed:', error.message);
@@ -97,19 +98,17 @@ app.post('/api/contact', async (request, response) => {
 });
 
 async function startServer() {
-  if (mongoClient) {
+  // 3. Connect to MongoDB using the URI from your .env file
+  if (mongoUri) {
     try {
-      await mongoClient.connect();
-      database = mongoClient.db(databaseName);
-      await database.command({ ping: 1 });
-      const contactsCollection = await database.listCollections({ name: 'contacts' }).hasNext();
-      if (!contactsCollection) await database.createCollection('contacts');
-      console.log(`MongoDB connected: ${databaseName}`);
+      await mongoose.connect(mongoUri, { family: 4 });
+      isDatabaseConnected = true;
+      console.log("Database Connected Successfully!");
     } catch (error) {
-      console.error('MongoDB connection failed:', error.message);
+      console.error("Database Connection Failed:", error.message);
     }
   } else {
-    console.warn('MONGODB_URI is missing. API started without database access.');
+    console.warn('MONGODB_URI is missing in .env file. API started without database access.');
   }
 
   app.listen(port, '0.0.0.0', () => {
@@ -118,9 +117,10 @@ async function startServer() {
 }
 
 async function shutdown() {
-  if (mongoClient) await mongoClient.close();
+  await mongoose.disconnect();
   process.exit(0);
 }
+
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 startServer();

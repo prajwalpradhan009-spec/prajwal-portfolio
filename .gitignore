@@ -1,7 +1,21 @@
+# Environment variables - NEVER commit these
 .env
+*.env
 .env.*
-!.env.example
+
+# Node dependencies
 node_modules/
-.venv/
+npm-debug.log*
+
+# Python cache
 __pycache__/
-*.py[cod]
+*.pyc
+*.pyo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp
