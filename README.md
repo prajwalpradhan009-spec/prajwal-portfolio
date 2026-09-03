@@ -92,9 +92,9 @@ Invoke-RestMethod -Method Post `
 
 ## Deployment
 
-### Frontend on Netlify
+### Frontend on Rander
 
-Create a Netlify site from this repository and set `Frontend` as the publish directory. Because the frontend is static, no build command is required.
+Create a Rander site from this repository and set `Frontend` as the publish directory. Because the frontend is static, no build command is required.
 
 ### Backend on Render
 
