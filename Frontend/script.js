@@ -3,12 +3,6 @@ lucide.createIcons();
 const themeToggle = document.querySelector('.theme-toggle');
 const isLocal = window.location.protocol === 'file:' || ['localhost', '127.0.0.1'].includes(window.location.hostname);
 const apiBase = window.PORTFOLIO_API_URL || (isLocal ? 'http://127.0.0.1:3000/api' : `${window.location.origin}/api`);
-const githubProfileLink = document.querySelector('.socials a[aria-label="GitHub"]');
-if (githubProfileLink) githubProfileLink.href = 'https://github.com/prajwalpradhan009-spec';
-const linkedinProfileLink = document.querySelector('.socials a[aria-label="LinkedIn"]');
-if (githubProfileLink) githubProfileLink.innerHTML = '<i data-lucide="github"></i>';
-if (linkedinProfileLink) linkedinProfileLink.innerHTML = '<i data-lucide="linkedin"></i>';
-lucide.createIcons();
 const savedTheme = localStorage.getItem('portfolio-theme');
 if (savedTheme === 'dark') document.documentElement.dataset.theme = 'dark';
 function updateThemeToggle() {
@@ -33,6 +27,9 @@ const navAnchors = document.querySelectorAll('.nav-links a:not(.resume-link)');
 
 window.addEventListener('scroll', () => {
   header.classList.toggle('scrolled', window.scrollY > 30);
+  const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = scrollableHeight > 0 ? (window.scrollY / scrollableHeight) * 100 : 0;
+  document.documentElement.style.setProperty('--scroll-progress', `${progress}%`);
   const sections = [...document.querySelectorAll('main section[id]')];
   const current = sections.find(section => window.scrollY >= section.offsetTop - 180 && window.scrollY < section.offsetTop + section.offsetHeight - 180);
   navAnchors.forEach(anchor => anchor.classList.toggle('active', current?.id === anchor.getAttribute('href').slice(1)));
@@ -102,7 +99,9 @@ const projectStacks = {
 const featuredProject = document.querySelector('.project-card.featured');
 document.querySelectorAll('.art-weather, .art-notes').forEach(art => art.closest('.project-card')?.remove());
 if (featuredProject) {
-  featuredProject.innerHTML = `<div class="project-art art-northstar"><div class="northstar-logo"><img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="PDF merge logo" /></div><strong>NORTHSTAR</strong><span>FILE STUDIO</span><div class="northstar-tools"><i data-lucide="file-up"></i><i data-lucide="image"></i><i data-lucide="download"></i></div></div><div class="project-info"><span class="project-number">01 / Featured</span><h3>Northstar File Studio</h3><p>Merge PDFs. Convert images. Keep file work simple.</p><div class="project-tech"><span>Python</span><span>CustomTkinter</span><span>Pillow</span></div><div class="project-actions"><button class="text-link project-open" data-project="Northstar File Studio"><span>View details</span><i data-lucide="arrow-up-right"></i></button><a class="text-link project-github" href="https://github.com/prajwalpradhan009-spec/-Northstar-Compress-PDF" target="_blank" rel="noreferrer"><span>GitHub</span><i data-lucide="github"></i></a><a class="text-link project-download" href="https://github.com/prajwalpradhan009-spec/-Northstar-Compress-PDF/archive/refs/heads/main.zip"><span>Download</span><i data-lucide="download"></i></a></div></div>`;
+  featuredProject.innerHTML = `<div class="project-art art-northstar"><strong class="live-badge">LIVE</strong><div class="northstar-logo"><img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="PDF merge logo" /></div><strong>NORTHSTAR</strong><span>FILE STUDIO</span><div class="northstar-tools"><i data-lucide="file-up"></i><i data-lucide="image"></i><i data-lucide="download"></i></div></div><div class="project-info"><span class="project-number">01 / Featured</span><h3>Northstar File Studio</h3><p>Merge PDFs. Convert images. Keep file work simple.</p><div class="project-tech"><span>Python</span><span>CustomTkinter</span><span>Pillow</span></div><div class="project-actions"><button class="text-link project-open" data-project="Northstar File Studio"><span>View details</span><i data-lucide="arrow-up-right"></i></button><a class="text-link project-github" href="https://github.com/prajwalpradhan009-spec/-Northstar-Compress-PDF" target="_blank" rel="noreferrer"><span>GitHub</span><i data-lucide="github"></i></a><a class="text-link project-download" href="https://github.com/prajwalpradhan009-spec/-Northstar-Compress-PDF/archive/refs/heads/main.zip"><span>Download</span><i data-lucide="download"></i></a></div></div>`;
+  featuredProject.insertAdjacentHTML('afterend', `<article class="project-card banking-project reveal reveal-delay"><div class="project-art art-banking"><span class="coming-soon">COMING SOON</span><i data-lucide="shield-check"></i><strong>SECURE BANKING</strong><small>FRAUD DETECTION SYSTEM</small><div class="banking-scan"></div></div><div class="project-info"><span class="project-number">02 / In progress</span><h3>Banking Management + Fraud Detection</h3><p>A secure management platform designed to monitor transactions and identify suspicious activity.</p><div class="project-tech"><span>Security</span><span>Analytics</span><span>Python</span></div></div></article>`);
+  featuredProject.nextElementSibling.classList.add('visible');
   lucide.createIcons();
 }
 document.querySelectorAll('.project-open').forEach(button => button.addEventListener('click', () => {
@@ -127,6 +126,8 @@ document.querySelector('.contact-form').addEventListener('submit', event => {
     message: form.elements[2].value.trim()
   };
   submitButton.disabled = true;
+  form.classList.remove('is-sent');
+  form.classList.add('is-sending');
   message.textContent = 'Sending...';
   fetch(`${apiBase}/contact`, {
     method: 'POST',
@@ -137,10 +138,12 @@ document.querySelector('.contact-form').addEventListener('submit', event => {
     return response.json();
   }).then(result => {
     message.textContent = 'Successful! Your message has been sent.';
+    form.classList.add('is-sent');
     form.reset();
   }).catch(() => {
     message.textContent = 'Unable to send your message. Please try again later.';
   }).finally(() => {
+    form.classList.remove('is-sending');
     submitButton.disabled = false;
   });
 });

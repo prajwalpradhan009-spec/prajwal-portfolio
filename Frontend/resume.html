@@ -6,43 +6,66 @@
   <meta name="description" content="Resume of Prajjwal Pradhan, BCA student and full-stack developer." />
   <title>Prajjwal Pradhan | Resume</title>
   <style>
-    :root { --ink: #10191b; --muted: #587075; --accent: #08aec4; --line: #d2e0e1; --paper: #ffffff; --wash: #f4f9f9; }
+    :root { --ink: #102027; --muted: #587078; --accent: #009eb2; --warm: #e5674e; --line: #c7dadd; --paper: #ffffff; --wash: #edf6f5; --mono: "Courier New", monospace; --sans: "Trebuchet MS", sans-serif; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: var(--wash); color: var(--ink); font: 15px/1.6 Arial, sans-serif; }
-    .resume { width: min(850px, calc(100% - 32px)); margin: 40px auto; padding: 58px 64px; background: var(--paper); box-shadow: 0 16px 50px rgba(16, 25, 27, .08); }
-    header { display: flex; justify-content: space-between; gap: 24px; padding-bottom: 28px; border-bottom: 3px solid var(--accent); }
-    h1 { margin: 0; font-size: 42px; line-height: 1.05; letter-spacing: -1.5px; }
-    .role { margin: 8px 0 0; color: var(--accent); font-weight: 700; }
-    .contact { margin: 0; color: var(--muted); text-align: right; font-size: 13px; }
-    section { margin-top: 28px; }
-    h2 { margin: 0 0 12px; color: var(--accent); font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; }
-    h3 { margin: 0; font-size: 17px; }
-    p { margin: 5px 0 0; }
+    body { margin: 0; background: radial-gradient(circle at 8% 10%, #d9f4f2, transparent 28%), var(--wash); color: var(--ink); font: 14px/1.65 var(--sans); }
+    .resume { width: min(940px, calc(100% - 32px)); margin: 52px auto; padding: 58px 64px 62px; background: var(--paper); border-top: 7px solid var(--accent); box-shadow: 0 22px 70px rgba(16, 32, 39, .14); }
+    header { display: flex; justify-content: space-between; gap: 34px; padding-bottom: 30px; border-bottom: 1px solid var(--line); }
+    .kicker { margin: 0 0 11px; color: var(--warm); font: 700 10px var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(40px, 6vw, 62px); line-height: .98; letter-spacing: -2.5px; }
+    .role { margin: 13px 0 0; color: var(--accent); font-weight: 700; font-size: 16px; }
+    .contact { margin: 7px 0 0; color: var(--muted); text-align: right; font-size: 12px; line-height: 1.9; }
+    .contact a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; transition: color .2s, border-color .2s; }
+    .contact a:hover, .contact a:focus-visible { color: var(--accent); border-color: var(--accent); }
+    .layout { display: grid; grid-template-columns: 1.55fr 1fr; gap: 54px; }
+    section { margin-top: 31px; }
+    h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; color: var(--accent); font: 700 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; }
+    h2::after { content: ""; height: 1px; flex: 1; background: var(--line); }
+    h3 { margin: 0; font-size: 17px; line-height: 1.3; }
+    p { margin: 6px 0 0; }
+    .profile { font-size: 16px; line-height: 1.75; max-width: 610px; }
     .muted { color: var(--muted); }
-    .item { margin-top: 16px; }
+    .item { margin-top: 21px; }
     .item:first-of-type { margin-top: 0; }
-    .meta { display: flex; justify-content: space-between; gap: 16px; color: var(--muted); font-size: 13px; }
-    .skills { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 30px; }
-    .skill { padding: 8px 0; border-bottom: 1px solid var(--line); }
-    .actions { position: fixed; top: 18px; right: 18px; display: flex; gap: 8px; }
-    .actions a, .actions button { border: 1px solid var(--ink); background: var(--ink); color: white; padding: 9px 13px; cursor: pointer; font: 700 12px Arial, sans-serif; text-decoration: none; }
+    .meta { display: flex; justify-content: space-between; gap: 16px; color: var(--muted); font: 11px var(--mono); }
+    .meta strong { color: var(--ink); font: 700 14px var(--sans); }
+    .project-label { color: var(--warm); font: 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .skills { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+    .skill { padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+    .skill strong { display: block; color: var(--ink); margin-bottom: 2px; }
+    .side section:first-child { margin-top: 31px; }
+    .focus-list { margin: 0; padding: 0; list-style: none; }
+    .focus-list li { padding: 9px 0 9px 17px; border-bottom: 1px solid var(--line); position: relative; }
+    .focus-list li::before { content: ""; position: absolute; left: 0; top: 18px; width: 6px; height: 6px; border-radius: 50%; background: var(--warm); }
+    .availability { padding: 16px 18px; border-left: 3px solid var(--accent); background: #effafa; color: var(--muted); }
+    .availability strong { display: block; color: var(--ink); margin-bottom: 3px; }
+    .actions { position: fixed; top: 18px; right: 18px; display: flex; gap: 8px; z-index: 2; }
+    .actions a, .actions button { border: 1px solid var(--ink); background: var(--ink); color: white; padding: 9px 13px; cursor: pointer; font: 700 11px var(--mono); text-decoration: none; }
     .actions a:first-child { background: var(--accent); border-color: var(--accent); }
-    @media print { body { background: white; } .resume { width: 100%; margin: 0; padding: 0; box-shadow: none; } .actions { display: none; } }
-    @media (max-width: 620px) { .resume { margin: 16px auto; padding: 32px 24px; } header { display: block; } .contact { margin-top: 16px; text-align: left; } h1 { font-size: 34px; } .skills { grid-template-columns: 1fr; } .actions { position: static; width: min(850px, calc(100% - 32px)); margin: 16px auto 0; } }
+    @media print { body { background: white; } .resume { width: 100%; margin: 0; padding: 0; border-top: 0; box-shadow: none; } .actions { display: none; } }
+    @media (max-width: 700px) { .resume { margin: 16px auto; padding: 38px 25px 42px; } header { display: block; } .contact { margin-top: 20px; text-align: left; } .layout { grid-template-columns: 1fr; gap: 0; } h1 { font-size: 42px; } .skills { grid-template-columns: 1fr; } .actions { position: static; width: min(940px, calc(100% - 32px)); margin: 16px auto 0; } }
   </style>
 </head>
 <body>
   <div class="actions"><a href="#" id="resume-download">Download</a><button type="button" onclick="window.print()">Print / PDF</button></div>
   <main class="resume">
     <header>
-      <div><h1>Prajjwal Pradhan</h1><p class="role">BCA Student / Full-Stack Developer</p></div>
-      <p class="contact">Gangtok, Sikkim, India<br />prajjwalpradhan900@gmail.com<br />github.com/prajwalpradhan009-spec</p>
+      <div><p class="kicker">Portfolio resume / 2026</p><h1>Prajjwal<br />Pradhan</h1><p class="role">BCA Student / Full-Stack Developer</p></div>
+      <p class="contact">Lingesy Pithamchin, West Bengal, India<br /><a href="mailto:prajwalpradhan009@gmail.com">prajwalpradhan009@gmail.com</a><br /><a href="https://github.com/prajwalpradhan009-spec" target="_blank" rel="noreferrer">github.com/prajwalpradhan009-spec</a><br /><a href="https://linkedin.com/in/prajwal-pradhan" target="_blank" rel="noreferrer">linkedin.com/in/prajwal-pradhan</a></p>
     </header>
-    <section><h2>Profile</h2><p>I am a curious BCA student focused on building useful, scalable and user-friendly digital products. I enjoy working across frontend interfaces, backend APIs, databases and the details that make a product feel considered.</p></section>
-    <section><h2>Education</h2><div class="item"><div class="meta"><strong>Sikkim Alpine University</strong><span>2025 - Present</span></div><h3>Bachelor of Computer Applications (BCA)</h3><p class="muted">Software development, data structures, databases and modern web technologies.</p></div></section>
-    <section><h2>Technical Skills</h2><div class="skills"><div class="skill"><strong>Languages</strong><br />Python, JavaScript, TypeScript, C</div><div class="skill"><strong>Frontend</strong><br />HTML, CSS, React.js, Vite</div><div class="skill"><strong>Backend</strong><br />Node.js, Express.js, Flask, FastAPI</div><div class="skill"><strong>Data and tools</strong><br />MongoDB, Mongoose, Git, GitHub, VS Code</div></div></section>
-    <section><h2>Projects</h2><div class="item"><h3>Northstar File Studio</h3><p class="muted">Python desktop utility for merging PDFs and converting, compressing and organizing images. Built with Python, CustomTkinter and Pillow.</p></div><div class="item"><h3>Weatherly</h3><p class="muted">A calm weather dashboard using JavaScript and REST API data for quick, readable updates.</p></div><div class="item"><h3>Mindful Notes</h3><p class="muted">A focused notes space built with HTML, CSS and Firebase for collecting thoughts without distractions.</p></div></section>
-    <section><h2>Additional</h2><p>2 certifications | Available for internships, collaborations and entry-level opportunities</p></section>
+    <div class="layout">
+      <div>
+        <section><h2>Profile</h2><p class="profile">Curious BCA student focused on building useful, scalable and user-friendly digital products. I enjoy moving between frontend interfaces, backend APIs, databases and the small details that make an experience feel considered.</p></section>
+        <section><h2>Projects</h2><div class="item"><p class="project-label">Featured / Desktop utility</p><h3>Northstar File Studio</h3><p class="muted">A Python desktop utility for merging PDFs and converting, compressing and organizing images. Built with Python, CustomTkinter and Pillow.</p></div><div class="item"><p class="project-label">Experiment / Web app</p><h3>Weatherly</h3><p class="muted">A calm weather dashboard using JavaScript and REST API data for quick, readable updates.</p></div><div class="item"><p class="project-label">Experiment / Focused tool</p><h3>Mindful Notes</h3><p class="muted">A focused notes space built with HTML, CSS and Firebase for collecting thoughts without distractions.</p></div></section>
+        <section><h2>Education</h2><div class="item"><div class="meta"><strong>Sikkim Alpine University</strong><span>2025 - Present</span></div><h3>Bachelor of Computer Applications (BCA)</h3><p class="muted">Software development, data structures, databases and modern web technologies.</p></div></section>
+      </div>
+      <aside class="side">
+        <section><h2>Toolkit</h2><div class="skills"><div class="skill"><strong>Languages</strong>Python, JavaScript, TypeScript, C</div><div class="skill"><strong>Frontend</strong>HTML, CSS, React.js, Vite</div><div class="skill"><strong>Backend</strong>Node.js, Express.js, Flask, FastAPI</div><div class="skill"><strong>Data & tools</strong>MongoDB, Mongoose, Git, GitHub, VS Code</div></div></section>
+        <section><h2>Focus</h2><ul class="focus-list"><li>Full-stack development</li><li>Python and backend foundations</li><li>Useful interface design</li><li>Learning through real projects</li></ul></section>
+        <section><h2>Availability</h2><div class="availability"><strong>Open to opportunities</strong>Internships, collaborations and entry-level roles where thoughtful design meets dependable code.</div></section>
+        <section><h2>Additional</h2><p class="muted">2 certifications<br />Available for internships and collaborations</p></section>
+      </aside>
+    </div>
   </main>
   <script>
     document.querySelector('#resume-download').addEventListener('click', event => {
