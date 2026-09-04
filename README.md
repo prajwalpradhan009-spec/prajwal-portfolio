@@ -1,76 +1,118 @@
 # Prajjwal Pradhan Portfolio
 
-A responsive developer portfolio with a static frontend and an optional Node.js/MongoDB contact API.
+A responsive developer portfolio built with plain HTML, CSS, and JavaScript, with an optional Express API for the contact form.
 
-## Features
+## Highlights
 
-- Responsive portfolio website
-- About, skills, projects, resume, and contact sections
-- Portrait profile image with a fallback mark
-- Contact form backed by MongoDB
-- Express API with CORS and environment-based configuration
-- Netlify configuration for the frontend
-- Render Blueprint configuration for the backend
+- Responsive portfolio with About, skills, education, projects, services, and contact sections
+- Light and dark themes with a mobile navigation menu
+- Downloadable resume page and profile imagery
+- Project details modal with GitHub and download links
+- Express API with CORS, health checks, project data, skills data, and contact handling
+- MongoDB persistence with a local JSON fallback for simple development
+
+## Tech Stack
+
+**Frontend:** HTML5, CSS3, vanilla JavaScript, Lucide icons
+
+**Backend:** Node.js, Express, Mongoose, MongoDB, dotenv
 
 ## Project Structure
 
 ```text
 .
-├── Frontend/       Static portfolio website
-├── backend/        Express and MongoDB API
-├── netlify.toml    Netlify frontend configuration
-├── render.yaml     Render backend configuration
-└── DEPLOYMENT.md   Deployment notes
+├── Frontend/
+│   ├── index.html       Portfolio page
+│   ├── resume.html      Resume page
+│   ├── styles.css       Responsive styles and themes
+│   ├── script.js        Interactions and contact form logic
+│   ├── config.js        Frontend API URL configuration
+│   ├── profile.jpg      Optional profile image
+│   └── 22.png           About section image
+├── backend/
+│   ├── server.js        Express API and static file server
+│   ├── package.json     Backend scripts and dependencies
+│   └── data/
+│       └── contacts.json Local fallback contact storage
+├── render.yaml          Render service configuration
+├── DEPLOYMENT.md        Deployment checklist
+└── README.md
 ```
 
-## Run the Frontend
+## Run Locally
 
-Open `Frontend/index.html` directly in a browser. The frontend does not require a build step or package installation.
+### Frontend only
 
-To use the profile image, keep `Frontend/profile.jpg` beside the frontend HTML files. If it is missing, the site displays the default `PP` mark.
+The frontend has no build step or frontend dependencies. Open `Frontend/index.html` directly in a browser.
 
-## Run the Backend
+The contact form expects the backend at `http://127.0.0.1:3000` when the page is opened with the `file:` protocol.
 
-Requirements: Node.js 18 or later and a MongoDB database.
+### Full application
+
+Requirements: Node.js 18 or later. MongoDB is optional because the API falls back to `backend/data/contacts.json` when `MONGODB_URI` is not configured.
 
 ```powershell
 Set-Location backend
 npm install
-Copy-Item .env.example .env
+```
+
+Create `backend/.env`:
+
+```env
+PORT=3000
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>?retryWrites=true&w=majority
+```
+
+Start the API:
+
+```powershell
 npm start
 ```
 
-Edit `backend/.env` with your MongoDB connection details:
+Open [http://127.0.0.1:3000](http://127.0.0.1:3000) to use the portfolio through the backend. During development, `npm run dev` starts Node's watch mode.
 
-```text
-PORT=3000
-MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/?retryWrites=true&w=majority
-MONGODB_DB=prajjwal_portfolio
+## API
+
+| Method | Endpoint              | Description                            |
+| ------ | --------------------- | -------------------------------------- |
+| `GET`  | `/api/health`         | Reports API and database status        |
+| `GET`  | `/api/projects`       | Returns all portfolio projects         |
+| `GET`  | `/api/projects/:slug` | Returns one project by slug            |
+| `GET`  | `/api/skills`         | Returns skills grouped by category     |
+| `POST` | `/api/contact`        | Validates and stores a contact message |
+
+Example contact request:
+
+```powershell
+Invoke-RestMethod -Method Post `
+	-Uri http://127.0.0.1:3000/api/contact `
+	-ContentType 'application/json' `
+	-Body '{"name":"Jane Doe","email":"jane@example.com","message":"Hello!"}'
 ```
-
-The API runs at `http://127.0.0.1:3000`.
-
-## API Endpoints
-
-| Method | Endpoint              | Description             |
-| ------ | --------------------- | ----------------------- |
-| `GET`  | `/api/health`         | API health check        |
-| `GET`  | `/api/projects`       | List portfolio projects |
-| `GET`  | `/api/projects/:slug` | Get one project         |
-| `GET`  | `/api/skills`         | List skills             |
-| `POST` | `/api/contact`        | Save a contact message  |
 
 ## Deployment
 
-- **Frontend:** Import the repository into [Netlify](https://www.netlify.com/) and use the `Frontend` directory as the published directory. The included `netlify.toml` provides the project configuration.
-- **Backend:** Create a Render Blueprint from the repository. Render reads `render.yaml`; add `MONGODB_URI` and other required environment variables in the Render dashboard.
-- **Frontend API URL:** After deploying the backend, set its URL in `Frontend/config.js` as `window.PORTFOLIO_API_URL`.
+### Frontend on Netlify
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for the full deployment checklist.
+Create a Netlify site from this repository and set `Frontend` as the publish directory. Because the frontend is static, no build command is required.
+
+### Backend on Render
+
+Create a Render web service using the included `render.yaml`. Set `MONGODB_URI` as a secret environment variable in Render. The backend listens on the configured `PORT` and serves the frontend files as well as the API.
+
+### Connect a separately deployed frontend
+
+After deploying the backend, set its API base URL in `Frontend/config.js`:
+
+```js
+window.PORTFOLIO_API_URL = "https://your-api.onrender.com/api";
+```
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the deployment checklist.
 
 ## Security
 
-Never commit `backend/.env`, MongoDB credentials, or API keys. Local environment files are excluded by `.gitignore`.
+Never commit `backend/.env`, MongoDB credentials, or API keys. Environment files are excluded by `.gitignore`.
 
 ## License
 
