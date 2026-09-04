@@ -92,17 +92,13 @@ Invoke-RestMethod -Method Post `
 
 ## Deployment
 
-### Frontend on Rander
+### Render
 
-Create a Rander site from this repository and set `Frontend` as the publish directory. Because the frontend is static, no build command is required.
+Create a Render Blueprint from this repository. Render uses the included `render.yaml` to install dependencies and start the Express service. The service serves both the portfolio frontend and the API.
 
-### Backend on Render
+Set `MONGODB_URI` as a secret environment variable in Render. After deployment, the portfolio is available at the Render service URL and the API is available under `/api`.
 
-Create a Render web service using the included `render.yaml`. Set `MONGODB_URI` as a secret environment variable in Render. The backend listens on the configured `PORT` and serves the frontend files as well as the API.
-
-### Connect a separately deployed frontend
-
-After deploying the backend, set its API base URL in `Frontend/config.js`:
+If the frontend is hosted separately, set its API base URL in `Frontend/config.js`:
 
 ```js
 window.PORTFOLIO_API_URL = "https://your-api.onrender.com/api";

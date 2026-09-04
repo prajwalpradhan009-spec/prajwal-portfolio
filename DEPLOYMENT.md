@@ -1,22 +1,17 @@
-# Free deployment
+# Free deployment with Render
 
-The frontend is configured for Netlify. The Node/MongoDB contact API must run separately on Render because Netlify hosts static frontend files, not a continuously running Express server.
+The Render service hosts the portfolio frontend and the Node/MongoDB contact API together. The included `render.yaml` defines the service, build command, and start command.
 
-## Netlify frontend
-
-1. Create a GitHub repository and upload this project folder.
-2. Create a free account at https://netlify.com.
-3. Choose **Add new site > Import an existing project** and select the repository.
-4. Netlify detects `netlify.toml` and publishes the `Frontend` folder.
-
-## Render backend
+## Render deployment
 
 1. Create a free account at https://render.com.
 2. Choose **New > Blueprint** and select the GitHub repository.
 3. Render detects `render.yaml`. Enter your MongoDB Atlas connection string for `MONGODB_URI`.
 4. Deploy the service.
 
-Copy the Render service URL, add `/api` to it, and put it in `Frontend/config.js` as `window.PORTFOLIO_API_URL`. Commit and push that change so Netlify redeploys the frontend. The API health check is at `/api/health`.
+The service URL opens the portfolio. The API health check is available at `<service-url>/api/health`.
+
+The frontend automatically uses the same origin in production. If you host the frontend separately, copy the Render service URL, add `/api`, and put it in `Frontend/config.js` as `window.PORTFOLIO_API_URL`.
 
 ## MongoDB Atlas
 
