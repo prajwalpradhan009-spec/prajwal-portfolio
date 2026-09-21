@@ -1,19 +1,23 @@
-# Prajjwal Pradhan Portfolio
+# Prajjwal Pradhan — Portfolio
 
-A responsive developer portfolio built with plain HTML, CSS, and JavaScript, with an optional Express API for the contact form.
+A fast, responsive developer portfolio built with plain HTML, CSS and JavaScript, with an optional Express API for the contact form. Light and dark themes, animated sections, and a mobile-first layout that stays smooth on tap.
 
 ## Highlights
 
-- Responsive portfolio with About, skills, education, projects, services, and contact sections
-- Light and dark themes with a mobile navigation menu
-- Downloadable resume page and profile imagery
-- Project details modal with GitHub and download links
-- Express API with CORS, health checks, project data, skills data, and contact handling
+- Fully responsive single page: Hero, About, Skills, Education, Projects, Services, Contact
+- Light / dark themes (persisted) with an animated header and scroll progress bar
+- Mobile navigation menu and touch-optimized interactions (no label taps, no sticky hover)
+- Project showcase with custom artwork and animations:
+  - **Northstar File Studio** — featured, PDF/image desktop utility
+  - **NovaCart** — E-commerce store, marked "Project In Progress"
+- Project detail modal with GitHub and download links
+- Downloadable HTML resume (`Frontend/resume.html`)
+- Express API with CORS, health checks, projects/skills data, and contact handling
 - MongoDB persistence with a local JSON fallback for simple development
 
 ## Tech Stack
 
-**Frontend:** HTML5, CSS3, vanilla JavaScript, Lucide icons
+**Frontend:** HTML5, CSS3, vanilla JavaScript, Lucide icons, Google Fonts (DM Mono, Manrope)
 
 **Backend:** Node.js, Express, Mongoose, MongoDB, dotenv
 
@@ -24,11 +28,12 @@ A responsive developer portfolio built with plain HTML, CSS, and JavaScript, wit
 ├── Frontend/
 │   ├── index.html       Portfolio page
 │   ├── resume.html      Resume page
-│   ├── styles.css       Responsive styles and themes
-│   ├── script.js        Interactions and contact form logic
+│   ├── styles.css       Responsive styles, themes and animations
+│   ├── script.js        Interactions, project cards and contact logic
 │   ├── config.js        Frontend API URL configuration
-│   ├── profile.jpg      Optional profile image
-│   └── 22.png           About section image
+│   ├── profile.jpg      Navbar profile logo
+│   ├── img.png          About section photo
+│   └── README.md        Frontend-specific notes
 ├── backend/
 │   ├── server.js        Express API and static file server
 │   ├── package.json     Backend scripts and dependencies
@@ -43,7 +48,7 @@ A responsive developer portfolio built with plain HTML, CSS, and JavaScript, wit
 
 ### Frontend only
 
-The frontend has no build step or frontend dependencies. Open `Frontend/index.html` directly in a browser.
+The frontend has no build step or dependencies — open `Frontend/index.html` directly in a browser.
 
 The contact form expects the backend at `http://127.0.0.1:3000` when the page is opened with the `file:` protocol.
 
@@ -90,13 +95,20 @@ Invoke-RestMethod -Method Post `
 	-Body '{"name":"Jane Doe","email":"jane@example.com","message":"Hello!"}'
 ```
 
+## Mobile & Touch
+
+- `touch-action: manipulation` prevents double-tap zoom delays on buttons and links
+- `-webkit-tap-highlight-color: transparent` removes the tap flash on iOS
+- Hover-only effects (card lifts, borders) are disabled on touch devices via `@media (hover: none)`
+- Reduced-motion users get all animations and transitions switched off
+
 ## Deployment
 
 ### Render
 
-Create a Render Blueprint from this repository. Render uses the included `render.yaml` to install dependencies and start the Express service. The service serves both the portfolio frontend and the API.
+Create a Render Blueprint from this repository. Render uses the included `render.yaml` to install dependencies and start the Express service, which serves both the portfolio frontend and the API.
 
-Set `MONGODB_URI` as a secret environment variable in Render. After deployment, the portfolio is available at the Render service URL and the API is available under `/api`.
+Set `MONGODB_URI` as a secret environment variable in Render. After deployment, the portfolio is available at the Render service URL and the API under `/api`.
 
 If the frontend is hosted separately, set its API base URL in `Frontend/config.js`:
 

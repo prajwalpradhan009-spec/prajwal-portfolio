@@ -10,7 +10,7 @@ Save the supplied portrait beside `index.html` with this exact filename:
 profile.jpg
 ```
 
-The same image is used in the navbar logo and the About section. If the file is missing, both locations fall back to the `PP` mark.
+The same image is used in the navbar logo and the About section. If the file is missing, both locations fall back to the `PP` mark. The About section also uses `img.png` beside `index.html`.
 
 ## Node.js and MongoDB backend
 
