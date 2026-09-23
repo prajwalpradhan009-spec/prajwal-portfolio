@@ -1,5 +1,50 @@
 lucide.createIcons();
 
+const termBody = document.getElementById('termBody');
+if (termBody) {
+  const codeLines = [
+    'import { AI_Agent } from "./jarvis";',
+    'const agent = new AI_Agent();',
+    'agent.configure({ voice: true, tasks: "auto" });',
+    'agent.watch("everyday work");',
+    '',
+    '// listening...',
+    'agent.on("idea", async (msg) => {',
+    '  await agent.build(msg);',
+    '  const reply = agent.answer(msg);',
+    '  console.log(reply);',
+    '});',
+    '',
+    'agent.run();',
+  ];
+  let lineIndex = 0;
+  let charIndex = 0;
+  const caret = termBody.querySelector('.term-caret');
+  function typeCode() {
+    if (document.hidden) { setTimeout(typeCode, 80); return; }
+    const full = codeLines[lineIndex];
+    if (charIndex < full.length) {
+      caret.before(document.createTextNode(full[charIndex]));
+      charIndex++;
+      setTimeout(typeCode, 26);
+      return;
+    }
+    termBody.append(document.createTextNode('\n'));
+    lineIndex++;
+    charIndex = 0;
+    if (lineIndex >= codeLines.length) {
+      setTimeout(() => { termBody.replaceChildren(caret); lineIndex = 0; typeCode(); }, 3200);
+    } else {
+      setTimeout(typeCode, 180);
+    }
+  }
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    setTimeout(typeCode, 400);
+  } else {
+    caret.before(document.createTextNode(codeLines.join('\n')));
+  }
+}
+
 const themeToggle = document.querySelector('.theme-toggle');
 const isLocal = window.location.protocol === 'file:' || ['localhost', '127.0.0.1'].includes(window.location.hostname);
 const apiBase = window.PORTFOLIO_API_URL || (isLocal ? 'http://127.0.0.1:3000/api' : `${window.location.origin}/api`);
@@ -101,7 +146,7 @@ const projectStacks = {
 const featuredProject = document.querySelector('.project-card.featured');
 document.querySelectorAll('.art-weather, .art-notes').forEach(art => art.closest('.project-card')?.remove());
 if (featuredProject) {
-  featuredProject.innerHTML = `<div class="project-art art-northstar"><strong class="live-badge">LIVE</strong><div class="northstar-logo"><img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="PDF merge logo" /></div><strong>NORTHSTAR</strong><span>FILE STUDIO</span><div class="northstar-tools"><i data-lucide="file-up"></i><i data-lucide="image"></i><i data-lucide="download"></i></div></div><div class="project-info"><span class="project-number">01 / Featured</span><h3>Northstar File Studio</h3><p>Merge PDFs. Convert images. Keep file work simple.</p><div class="project-tech"><span>Python</span><span>CustomTkinter</span><span>Pillow</span></div><div class="project-actions"><button class="text-link project-open" data-project="Northstar File Studio"><span>View details</span><i data-lucide="arrow-up-right"></i></button><a class="text-link project-github" href="https://github.com/prajwalpradhan009-spec/-Northstar-Compress-PDF" target="_blank" rel="noreferrer"><span>GitHub</span><i data-lucide="github"></i></a><a class="text-link project-download" href="https://github.com/prajwalpradhan009-spec/-Northstar-Compress-PDF/archive/refs/heads/main.zip"><span>Download</span><i data-lucide="download"></i></a></div></div>`;
+  featuredProject.innerHTML = `<div class="project-art art-northstar"><div class="northstar-tools"><i data-lucide="file-up"></i><i data-lucide="image"></i><i data-lucide="download"></i></div></div><div class="project-info"><span class="project-number">01 / Featured</span><h3>Northstar File Studio</h3><p>Merge PDFs. Convert images. Keep file work simple.</p><div class="project-tech"><span>Python</span><span>CustomTkinter</span><span>Pillow</span></div><div class="project-actions"><button class="text-link project-open" data-project="Northstar File Studio"><span>View details</span><i data-lucide="arrow-up-right"></i></button><a class="text-link project-github" href="https://github.com/prajwalpradhan009-spec/-Northstar-Compress-PDF" target="_blank" rel="noreferrer"><span>GitHub</span><i data-lucide="github"></i></a><a class="text-link project-download" href="https://github.com/prajwalpradhan009-spec/-Northstar-Compress-PDF/archive/refs/heads/main.zip"><span>Download</span><i data-lucide="download"></i></a></div></div>`;
   featuredProject.insertAdjacentHTML('afterend', `<article class="project-card banking-project reveal reveal-delay"><div class="project-art art-banking art-shop"><strong class="progress-badge">Project In Progress</strong><div class="jarvis-scan"></div><div class="shop-tile tile-1"><i data-lucide="shopping-bag"></i></div><div class="shop-tile tile-2"><i data-lucide="package"></i></div><div class="shop-tile tile-3"><i data-lucide="tag"></i></div><div class="novacart-logo"><svg viewBox="0 0 120 120" fill="none" aria-hidden="true"><defs><linearGradient id="ncGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#69e5e1"/><stop offset="1" stop-color="#ffab84"/></linearGradient></defs><rect x="10" y="10" width="100" height="100" rx="28" fill="#0f2832" stroke="url(#ncGrad)" stroke-width="3"/><path d="M48 41v-6a12 12 0 0 1 24 0v6" stroke="#69e5e1" stroke-width="5" fill="none"/><rect x="31" y="41" width="58" height="45" rx="10" fill="#12333d" stroke="#69e5e1" stroke-width="5"/><path d="M42 79V49l36 30V49" stroke="#ffab84" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="60" cy="28" r="7" fill="#69e5e1"/></svg></div><strong>NOVACART</strong><small>E-COMMERCE</small></div><div class="project-info"><span class="project-number">02 / Experiment</span><h3>NovaCart</h3><p>A complete online store — browse products, build your cart and check out through a clean, responsive shopping flow.</p><div class="project-tech"><span>React</span><span>Node.js</span><span>MongoDB</span></div><div class="project-actions"><button class="text-link project-open" data-project="NovaCart"><span>View details</span><i data-lucide="arrow-up-right"></i></button><a class="text-link project-github" href="https://github.com/prajwalpradhan009-spec" target="_blank" rel="noreferrer"><span>GitHub</span><i data-lucide="github"></i></a></div></div></article>`);
   featuredProject.nextElementSibling.classList.add('visible');
   lucide.createIcons();
