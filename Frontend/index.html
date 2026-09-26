@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="github.css" />
 </head>
 <body>
   <div class="page-noise"></div>
@@ -17,7 +18,7 @@
       <a class="brand" href="#home" aria-label="Prajjwal Pradhan home"><span class="brand-logo"><img src="profile.jpg" alt="" onerror="this.style.display='none'" /></span><span class="brand-name">Prajwal Pradhan</span></a>
       <button class="menu-toggle" aria-label="Open navigation" aria-expanded="false"><i data-lucide="menu"></i></button>
       <div class="nav-links">
-        <a class="active" href="#home">Home</a><a href="#about">About</a><a href="#skills">Skills</a><a href="#education">Education</a><a href="#projects">Projects</a><a href="#services">Services</a><a href="#contact">Contact</a>
+        <a class="active" href="#home">Home</a><a href="#about">About</a><a href="#skills">Skills</a><a href="#education">Education</a><a href="#projects">Projects</a><a href="#github">GitHub</a><a href="#services">Services</a><a href="#contact">Contact</a>
         <a class="resume-link" href="resume.html" download="Prajwal-Pradhan-Resume.html"><i data-lucide="download"></i> Resume</a><button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"><i data-lucide="moon"></i><span>Dark</span></button>
       </div>
     </nav>
@@ -117,12 +118,114 @@
 
     <section class="section section-tint" id="projects"><div class="container"><div class="section-heading split-heading reveal"><div><p class="eyebrow">04 / Selected work</p><h2>Ideas, made<br /><em>real.</em></h2></div><p class="heading-note">A few experiments and projects<br />I’m proud to have shipped.</p></div><div class="projects-grid"><article class="project-card featured reveal"><div class="project-art art-dashboard"><div class="mini-top"><span></span><span></span><span></span></div><div class="mini-chart"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="mini-sidebar"><b>OVERVIEW</b><span></span><span></span><span></span></div></div><div class="project-info"><span class="project-number">01 / Featured</span><h3>Campus Connect</h3><p>A student-first platform to discover events, connect with peers and keep campus life in one place.</p><div class="project-tech"><span>React</span><span>Node.js</span><span>MongoDB</span></div><button class="text-link project-open" data-project="Campus Connect"><span>View details</span><i data-lucide="arrow-up-right"></i></button></div></article><article class="project-card reveal reveal-delay"><div class="project-art art-weather"><i data-lucide="cloud-sun"></i><b>24°</b><span>West Bengal, IN</span></div><div class="project-info"><span class="project-number">02 / Experiment</span><h3>Weatherly</h3><p>A clean weather dashboard designed around calm, glanceable information.</p><div class="project-tech"><span>JavaScript</span><span>API</span></div><button class="text-link project-open" data-project="Weatherly"><span>View details</span><i data-lucide="arrow-up-right"></i></button></div></article><article class="project-card reveal"><div class="project-art art-notes"><i data-lucide="notebook-pen"></i><span>ideas worth<br /><b>keeping.</b></span></div><div class="project-info"><span class="project-number">03 / Experiment</span><h3>Mindful Notes</h3><p>A focused notes space for collecting thoughts without the noise.</p><div class="project-tech"><span>HTML / CSS</span><span>Firebase</span></div><button class="text-link project-open" data-project="Mindful Notes"><span>View details</span><i data-lucide="arrow-up-right"></i></button></div></article></div></div></section>
 
-    <section class="section container services-section" id="services"><div class="section-heading reveal"><p class="eyebrow">05 / What I do</p><h2>Useful by<br /><em>design.</em></h2></div><div class="services-list"><article class="service reveal"><span>01</span><i data-lucide="monitor-smartphone"></i><div><h3>Web experiences</h3><p class="service-desc">Responsive interfaces that feel clear, fast and effortless on every device. I care about the details — spacing, speed and motion — that turn a usable page into one people enjoy.</p><p class="service-more">From landing pages to complex dashboards, the goal is always the same: make it obvious, make it smooth, make it a pleasure to use.</p></div><i class="service-arrow" data-lucide="arrow-up-right"></i></article><article class="service reveal reveal-delay"><span>02</span><i data-lucide="boxes"></i><div><h3>Full-stack applications</h3><p class="service-desc">Complete products built from the database up. I connect thoughtful frontends to dependable APIs, authentication and clean data models so every feature works the way it should.</p><p class="service-more">Planning the data flow before writing code keeps things scalable, secure and genuinely simple to maintain over time.</p></div><i class="service-arrow" data-lucide="arrow-up-right"></i></article><article class="service reveal"><span>03</span><i data-lucide="sparkles"></i><div><h3>Creative problem-solving</h3><p class="service-desc">I take fuzzy ideas and turn them into focused, practical digital products. It starts with asking the right questions, then choosing the simplest tool that solves the problem well.</p><p class="service-more">The result is something people can actually use — not just a demo that looks good in a screenshot.</p></div><i class="service-arrow" data-lucide="arrow-up-right"></i></article></div></section>
+    <section class="section section-tint gh-section" id="github" data-github-activity aria-busy="true">
+      <div class="gh-bg" aria-hidden="true"></div>
+      <div class="gh-particles" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="container">
+        <div class="section-heading split-heading reveal">
+          <div>
+            <p class="eyebrow">05 / GitHub activity</p>
+            <h2>Live from<br /><em>my GitHub.</em></h2>
+          </div>
+          <p class="heading-note">Fetched from the GitHub API on every visit.<br />Real numbers only — never faked.</p>
+        </div>
 
-    <section class="contact-section" id="contact"><div class="container contact-grid"><div class="contact-copy reveal"><p class="eyebrow">06 / Say hello</p><h2>Have an idea?<br /><em>Let’s build it.</em></h2><p>Whether it’s a project, a collaboration, or just a good conversation about technology, my inbox is open.</p><a class="email-link" href="mailto:prajwalpradhan009@gmail.com">prajwalpradhan009@gmail.com <i data-lucide="arrow-up-right"></i></a></div><form class="contact-form reveal reveal-delay"><label>Your name<input type="text" placeholder="Jane Doe" required /></label><label>Email address<input type="email" placeholder="jane@example.com" required /></label><label>Tell me about it<textarea placeholder="A little about your idea..." rows="4" required></textarea></label><button class="button button-primary" type="submit">Send message <i data-lucide="send"></i></button><p class="form-message" aria-live="polite"></p></form></div></section>
+        <p class="gh-status" data-gh-status role="status" aria-live="polite">Loading live GitHub data…</p>
+
+        <div class="gh-skeleton" data-gh-skeleton aria-hidden="true">
+          <div class="gh-skeleton-bar"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="gh-skeleton-grid"><span></span><span></span><span></span></div>
+          <div class="gh-skeleton-block"><span></span></div>
+        </div>
+
+        <div class="gh-notice" data-gh-error hidden>
+          <i data-lucide="cloud-off"></i>
+          <div>
+            <h3>GitHub data unavailable</h3>
+            <p data-gh-error-message>We could not reach the GitHub API just now. Nothing is being estimated in its place.</p>
+          </div>
+          <button class="button button-quiet gh-retry" type="button" data-gh-retry><span>Try again</span><i data-lucide="refresh-cw"></i></button>
+        </div>
+
+        <div class="gh-dashboard" data-gh-dashboard hidden>
+          <header class="gh-topbar">
+            <div class="gh-identity">
+              <span class="gh-avatar" data-gh-avatar aria-hidden="true"></span>
+              <div class="gh-identity-text">
+                <h3 data-gh-name>—</h3>
+                <p class="gh-handle" data-gh-handle>—</p>
+              </div>
+            </div>
+            <p class="gh-freshness">
+              <span class="gh-live-dot" data-gh-live-dot aria-hidden="true"></span>
+              <span data-gh-freshness>Synced with GitHub</span>
+            </p>
+          </header>
+
+          <ul class="gh-stats" data-gh-stats>
+            <li class="gh-stat"><span class="gh-stat-icon"><i data-lucide="git-commit-horizontal"></i></span><strong data-gh-stat="contributions">—</strong><span class="gh-stat-label">Contributions <small>last 12 months</small></span></li>
+            <li class="gh-stat"><span class="gh-stat-icon"><i data-lucide="folder-git-2"></i></span><strong data-gh-stat="publicRepos">—</strong><span class="gh-stat-label">Public repos</span></li>
+            <li class="gh-stat"><span class="gh-stat-icon"><i data-lucide="star"></i></span><strong data-gh-stat="totalStars">—</strong><span class="gh-stat-label">Total stars</span></li>
+            <li class="gh-stat"><span class="gh-stat-icon"><i data-lucide="git-fork"></i></span><strong data-gh-stat="totalForks">—</strong><span class="gh-stat-label">Total forks</span></li>
+            <li class="gh-stat"><span class="gh-stat-icon"><i data-lucide="users"></i></span><strong data-gh-stat="followers">—</strong><span class="gh-stat-label">Followers</span></li>
+          </ul>
+
+          <div class="gh-panels">
+            <article class="gh-panel gh-chart-panel">
+              <header class="gh-panel-head">
+                <h3><i data-lucide="activity"></i> Activity over time</h3>
+                <span class="gh-panel-note" data-gh-chart-note>Contributions per month</span>
+              </header>
+              <div class="gh-chart-scroll">
+                <div class="gh-chart" data-gh-chart></div>
+              </div>
+              <p class="gh-panel-foot" data-gh-chart-foot></p>
+            </article>
+
+            <article class="gh-panel gh-repos-panel">
+              <header class="gh-panel-head">
+                <h3><i data-lucide="folder-git-2"></i> Recent public repositories</h3>
+                <span class="gh-panel-note" data-gh-repos-note></span>
+              </header>
+              <ul class="gh-repos" data-gh-repos></ul>
+              <p class="gh-empty" data-gh-repos-empty hidden>No public repositories to show yet.</p>
+            </article>
+          </div>
+
+          <article class="gh-panel gh-calendar-panel">
+            <header class="gh-panel-head">
+              <h3><i data-lucide="calendar-days"></i> Contribution calendar</h3>
+              <div class="gh-legend" aria-hidden="true"><span>Less</span><i class="gh-cell" data-level="0"></i><i class="gh-cell" data-level="1"></i><i class="gh-cell" data-level="2"></i><i class="gh-cell" data-level="3"></i><i class="gh-cell" data-level="4"></i><span>More</span></div>
+            </header>
+            <div class="gh-calendar-scroll">
+              <div class="gh-calendar" data-gh-calendar role="grid" aria-label="Daily contribution counts for the last 12 months"></div>
+            </div>
+            <p class="gh-panel-foot gh-hint" data-gh-calendar-hint>Hover a square for the daily count, or focus the grid and use the arrow keys.</p>
+            <div class="gh-unavailable" data-gh-contributions-unavailable hidden>
+              <i data-lucide="calendar-off"></i>
+              <div>
+                <strong>Contribution data unavailable</strong>
+                <span data-gh-contributions-notice></span>
+              </div>
+            </div>
+          </article>
+
+          <div class="gh-actions">
+            <a class="button button-primary" data-gh-profile-link href="https://github.com/prajwalpradhan009-spec" target="_blank" rel="noreferrer"><span>GitHub Profile</span><i data-lucide="arrow-up-right"></i></a>
+            <a class="button button-quiet" data-gh-repos-link href="https://github.com/prajwalpradhan009-spec?tab=repositories&visibility=public" target="_blank" rel="noreferrer"><span>View Repositories</span><i data-lucide="github"></i></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section container services-section" id="services"><div class="section-heading reveal"><p class="eyebrow">06 / What I do</p><h2>Useful by<br /><em>design.</em></h2></div><div class="services-list"><article class="service reveal"><span>01</span><i data-lucide="monitor-smartphone"></i><div><h3>Web experiences</h3><p class="service-desc">Responsive interfaces that feel clear, fast and effortless on every device. I care about the details — spacing, speed and motion — that turn a usable page into one people enjoy.</p><p class="service-more">From landing pages to complex dashboards, the goal is always the same: make it obvious, make it smooth, make it a pleasure to use.</p></div><i class="service-arrow" data-lucide="arrow-up-right"></i></article><article class="service reveal reveal-delay"><span>02</span><i data-lucide="boxes"></i><div><h3>Full-stack applications</h3><p class="service-desc">Complete products built from the database up. I connect thoughtful frontends to dependable APIs, authentication and clean data models so every feature works the way it should.</p><p class="service-more">Planning the data flow before writing code keeps things scalable, secure and genuinely simple to maintain over time.</p></div><i class="service-arrow" data-lucide="arrow-up-right"></i></article><article class="service reveal"><span>03</span><i data-lucide="sparkles"></i><div><h3>Creative problem-solving</h3><p class="service-desc">I take fuzzy ideas and turn them into focused, practical digital products. It starts with asking the right questions, then choosing the simplest tool that solves the problem well.</p><p class="service-more">The result is something people can actually use — not just a demo that looks good in a screenshot.</p></div><i class="service-arrow" data-lucide="arrow-up-right"></i></article></div></section>
+
+    <section class="contact-section" id="contact"><div class="container contact-grid"><div class="contact-copy reveal"><p class="eyebrow">07 / Say hello</p><h2>Have an idea?<br /><em>Let’s build it.</em></h2><p>Whether it’s a project, a collaboration, or just a good conversation about technology, my inbox is open.</p><a class="email-link" href="mailto:prajwalpradhan009@gmail.com">prajwalpradhan009@gmail.com <i data-lucide="arrow-up-right"></i></a></div><form class="contact-form reveal reveal-delay"><label>Your name<input type="text" placeholder="Jane Doe" required /></label><label>Email address<input type="email" placeholder="jane@example.com" required /></label><label>Tell me about it<textarea placeholder="A little about your idea..." rows="4" required></textarea></label><button class="button button-primary" type="submit">Send message <i data-lucide="send"></i></button><p class="form-message" aria-live="polite"></p></form></div></section>
   </main>
   <footer class="footer container"><span>© 2025 Prajjwal Pradhan</span><span>Designed & built with intention.</i></a></footer>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal-panel"><button class="modal-close" aria-label="Close project details"><i data-lucide="x"></i></button><p class="eyebrow">Project details</p><h2 id="modal-title"></h2><p class="modal-body"></p><div class="modal-stack"><span>React.js</span><span>Node.js</span><span>MongoDB</span></div></div></div>
-  <script src="https://unpkg.com/lucide@latest"></script><script src="config.js"></script><script src="script.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script><script src="config.js"></script><script src="script.js"></script><script src="github.js"></script>
 </body>
 </html>

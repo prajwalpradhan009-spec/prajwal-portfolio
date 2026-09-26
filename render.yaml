@@ -8,5 +8,11 @@ services:
     envVars:
       - key: MONGODB_URI
         sync: false
+      - key: GITHUB_USERNAME
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: GITHUB_CACHE_MINUTES
+        value: 10
       - key: PORT
         value: 3000

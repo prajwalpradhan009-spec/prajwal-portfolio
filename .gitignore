@@ -3,9 +3,17 @@
 *.env
 .env.*
 
+# ...but the placeholder template is safe to track
+!.env.example
+!.env.*.example
+
 # Node dependencies
 node_modules/
 npm-debug.log*
+
+# Local contact form submissions (visitor emails stay private)
+backend/data/contacts.json
+
 
 # Python cache
 __pycache__/

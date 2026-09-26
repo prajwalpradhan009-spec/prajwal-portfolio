@@ -1,0 +1,1039 @@
+
+/* =========================================================================
+   GitHub Activity dashboard
+   Live data from GET /api/github. Glass surfaces, green accent, clean type.
+   ========================================================================= */
+
+[hidden] {
+  display: none !important;
+}
+
+/* The rest of the site forces weight 600 on body copy. The dashboard overrides
+   it so the smaller labels stay crisp and readable. */
+.gh-section :where(p, span, a, small, li) {
+  font-weight: 400 !important;
+}
+
+/* Accent + readable type scale for the dashboard. The section follows the site
+   theme, so these are the only tokens it overrides. */
+.gh-section {
+  --gh-accent: #17a05a;
+  --gh-accent-bright: #2fbf77;
+  --gh-accent-deep: #0f6b3c;
+  --gh-ink: var(--text);
+  --gh-ink-soft: color-mix(in srgb, var(--text) 72%, transparent);
+  --gh-ink-faint: color-mix(in srgb, var(--text) 52%, transparent);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+html[data-theme="dark"] .gh-section {
+  --gh-accent: #3ddc84;
+  --gh-accent-bright: #8dffbe;
+  --gh-accent-deep: #1a9e58;
+  --gh-ink-soft: color-mix(in srgb, var(--text) 78%, transparent);
+  --gh-ink-faint: color-mix(in srgb, var(--text) 58%, transparent);
+}
+
+/* ------------------------------------------------------- coding backdrop */
+
+/* Code grid + soft glows, tuned per theme. Light mode needs darker, denser
+   lines to stay visible on the pale panel; dark mode uses faint teal. */
+.gh-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--gh-accent) 16%, transparent), transparent 32%),
+    radial-gradient(circle at 88% 22%, color-mix(in srgb, var(--mint) 10%, transparent), transparent 30%),
+    radial-gradient(circle at 50% 96%, color-mix(in srgb, var(--orange) 9%, transparent), transparent 28%),
+    linear-gradient(rgba(0, 158, 178, 0.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 158, 178, 0.13) 1px, transparent 1px);
+  background-size: auto, auto, auto, 42px 42px, 42px 42px;
+  background-position: center, center, center, 0 0, 0 0;
+}
+html[data-theme="dark"] .gh-bg {
+  background-image:
+    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--gh-accent) 20%, transparent), transparent 32%),
+    radial-gradient(circle at 88% 22%, color-mix(in srgb, var(--mint) 12%, transparent), transparent 30%),
+    radial-gradient(circle at 50% 96%, color-mix(in srgb, var(--orange) 10%, transparent), transparent 28%),
+    linear-gradient(rgba(105, 229, 225, 0.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(105, 229, 225, 0.11) 1px, transparent 1px);
+}
+
+/* Floating code fragments, same idea as the hero particles. */
+.gh-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.5;
+}
+.gh-particles span {
+  position: absolute;
+  color: rgba(0, 158, 178, 0.55);
+  font: 10px var(--mono);
+  animation: code-particle 9s linear infinite;
+}
+html[data-theme="dark"] .gh-particles span {
+  color: rgba(105, 229, 225, 0.72);
+}
+.gh-particles span::before {
+  content: "0 1 0\\A 1 0 1\\A const()";
+  white-space: pre;
+}
+.gh-particles span:nth-child(1) { left: 8%; top: 62%; animation-delay: -1.5s; }
+.gh-particles span:nth-child(2) { left: 18%; top: 78%; animation-delay: -4.5s; }
+.gh-particles span:nth-child(3) { left: 31%; top: 68%; animation-delay: -2.5s; }
+.gh-particles span:nth-child(4) { left: 44%; top: 82%; animation-delay: -6.5s; }
+.gh-particles span:nth-child(5) { left: 57%; top: 64%; animation-delay: -3.5s; }
+.gh-particles span:nth-child(6) { left: 69%; top: 79%; animation-delay: -5.5s; }
+.gh-particles span:nth-child(7) { left: 81%; top: 66%; animation-delay: -7.5s; }
+.gh-particles span:nth-child(8) { left: 91%; top: 84%; animation-delay: -2.8s; }
+
+.gh-section > .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Dark mode tones the fragments down so they never compete with the
+   dashboard surfaces. */
+html[data-theme="dark"] .gh-particles {
+  opacity: 0.38;
+}
+
+/* ------------------------------------------------- front heading & copy */
+
+/* Clearer, cleaner front text. Colours come from the site theme, so the
+   heading and note stay legible in both light and dark mode. */
+.gh-section .section-heading h2 {
+  color: var(--text);
+  letter-spacing: -0.055em;
+}
+.gh-section .section-heading h2 em {
+  color: var(--gh-accent);
+}
+.gh-section .eyebrow {
+  color: color-mix(in srgb, var(--gh-accent) 78%, var(--text));
+  letter-spacing: 0.14em;
+}
+.gh-section .heading-note {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.85;
+  max-width: 34ch;
+}
+
+
+/* ------------------------------------------------------------ status line */
+
+.gh-status {
+  font: 500 12.5px var(--sans);
+  font-weight: 500 !important;
+  color: var(--gh-ink-soft);
+  letter-spacing: 0.01em;
+  line-height: 1.6;
+  margin: -30px 0 26px;
+}
+.gh-status:empty {
+  display: none;
+}
+.gh-status.is-error {
+  color: var(--orange);
+}
+
+/* ------------------------------------------------------------- surfaces */
+
+.gh-dashboard,
+.gh-panel,
+.gh-stat,
+.gh-skeleton-bar,
+.gh-skeleton-block {
+  background: color-mix(in srgb, var(--panel) 58%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gh-accent) 18%, var(--line));
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--gh-accent) 14%, transparent),
+    0 22px 50px rgba(4, 16, 20, 0.22);
+}
+html[data-theme="dark"] .gh-dashboard,
+html[data-theme="dark"] .gh-panel,
+html[data-theme="dark"] .gh-stat,
+html[data-theme="dark"] .gh-skeleton-bar,
+html[data-theme="dark"] .gh-skeleton-block {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--panel-2) 84%, transparent), color-mix(in srgb, var(--panel) 74%, transparent));
+  border-color: color-mix(in srgb, var(--gh-accent) 24%, var(--line));
+  box-shadow:
+    inset 0 1px 0 rgba(61, 220, 132, 0.14),
+    0 0 0 1px rgba(61, 220, 132, 0.06),
+    0 26px 60px rgba(2, 10, 14, 0.55);
+}
+/* The month graph sits directly on the section tint in dark mode. The panel
+   gradient above is dark enough to read as a black block behind the bars, so
+   this one keeps only its border and shadow. */
+html[data-theme="dark"] .gh-chart-panel {
+  background: none;
+}
+
+.gh-dashboard {
+  border-radius: 30px;
+  padding: 30px;
+  display: grid;
+  gap: 18px;
+}
+/* Grid items default to a min-content floor, which would let the 53-week
+   calendar stretch the whole dashboard on narrow screens. */
+.gh-dashboard > *,
+.gh-panels > * {
+  min-width: 0;
+}
+.gh-section.is-ready .gh-dashboard {
+  animation: gh-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.gh-panel {
+  border-radius: 24px;
+  padding: 24px 24px 20px;
+}
+.gh-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+.gh-panel-head h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 16px;
+  font-weight: 800 !important;
+  letter-spacing: -0.015em;
+  color: var(--gh-ink);
+  margin: 0;
+}
+.gh-panel-head h3 svg {
+  width: 17px;
+  height: 17px;
+  color: var(--gh-accent);
+}
+.gh-panel-note {
+  font: 400 11.5px var(--sans);
+  color: var(--gh-ink-faint);
+  letter-spacing: 0.02em;
+}
+.gh-panel-foot {
+  font: 400 11.5px var(--sans);
+  color: var(--gh-ink-soft);
+  letter-spacing: 0.01em;
+  line-height: 1.6;
+  margin: 18px 0 0;
+}
+.gh-hint {
+  color: var(--gh-ink-faint);
+  font-size: 11px;
+}
+
+/* ---------------------------------------------------------------- topbar */
+
+.gh-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--gh-accent) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gh-accent) 22%, transparent);
+}
+.gh-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.gh-avatar {
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--panel-2) 90%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--gh-accent) 60%, transparent), 0 0 24px color-mix(in srgb, var(--gh-accent) 30%, transparent);
+}
+.gh-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.gh-identity-text {
+  min-width: 0;
+}
+.gh-identity h3 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 800 !important;
+  letter-spacing: -0.025em;
+  color: var(--gh-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gh-handle {
+  font: 400 12px var(--mono);
+  color: var(--gh-ink-soft);
+  margin: 5px 0 0;
+  letter-spacing: 0.01em;
+}
+.gh-freshness {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  font: 400 11px var(--mono);
+  color: var(--gh-ink-soft);
+  letter-spacing: 0.03em;
+}
+.gh-live-dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gh-accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--gh-accent) 70%, transparent);
+  animation: gh-pulse 2.4s ease-in-out infinite;
+}
+.gh-live-dot.is-stale {
+  background: var(--orange);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--orange) 70%, transparent);
+}
+
+/* ----------------------------------------------------------------- stats */
+
+.gh-stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+  gap: 12px;
+}
+.gh-stat {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  padding: 18px 18px 16px;
+  display: grid;
+  gap: 5px;
+  transition: transform 0.28s, border-color 0.28s, box-shadow 0.28s;
+}
+.gh-stat::after {
+  content: "";
+  position: absolute;
+  inset: auto -30% -60% auto;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--gh-accent) 26%, transparent), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.35s;
+  pointer-events: none;
+}
+.gh-stat:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--gh-accent) 50%, var(--line));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--gh-accent) 18%, transparent),
+    0 0 26px color-mix(in srgb, var(--gh-accent) 20%, transparent);
+}
+.gh-stat:hover::after {
+  opacity: 1;
+}
+.gh-stat-icon {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--gh-accent) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gh-accent) 30%, transparent);
+  color: var(--gh-accent);
+}
+.gh-stat-icon svg {
+  width: 16px;
+  height: 16px;
+}
+.gh-stat strong {
+  font-size: clamp(27px, 3vw, 35px);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  color: var(--gh-ink);
+  font-variant-numeric: tabular-nums;
+  position: relative;
+  z-index: 1;
+}
+.gh-stat strong.is-unavailable {
+  color: var(--gh-ink-faint);
+}
+.gh-stat-label {
+  font: 500 11px var(--mono);
+  font-weight: 500 !important;
+  color: var(--gh-ink-soft);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+.gh-stat-label small {
+  display: block;
+  font: 400 11px var(--sans);
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--gh-ink-faint);
+  margin-top: 4px;
+}
+
+/* ---------------------------------------------------------------- panels */
+
+/* `align-items: start` keeps each panel at its own content height. The chart
+   column is deliberately narrower than the repos column: the month graph only
+   needs a compact box, and the extra room lets the repo cards sit two per row. */
+.gh-panels {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 18px;
+}
+@media (min-width: 1080px) {
+  .gh-panels {
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  }
+}
+
+/* ----------------------------------------------------------------- chart */
+
+.gh-chart-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-width: 0;
+  scrollbar-width: thin;
+}
+.gh-chart {
+  position: relative;
+  width: 100%;
+  min-width: 340px;
+  /* Caps the graph on very wide screens; the panel itself is the smaller of
+     the two columns, so it usually binds well before this. */
+  max-width: 620px;
+  margin-inline: auto;
+}
+.gh-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.gh-chart-grid {
+  stroke: color-mix(in srgb, var(--line) 70%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 3 6;
+}
+.gh-chart-axis {
+  fill: var(--gh-ink-faint);
+  font: 400 11.5px var(--mono);
+  letter-spacing: 0.04em;
+}
+.gh-chart-label {
+  fill: var(--gh-ink-soft);
+  font: 400 11.5px var(--mono);
+  letter-spacing: 0.06em;
+}
+.gh-chart-area {
+  fill: url(#ghChartFill);
+  opacity: 0;
+  animation: gh-fade-in 0.9s 0.5s ease forwards;
+}
+.gh-chart-line {
+  fill: none;
+  stroke: var(--gh-accent);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--gh-accent-bright) 55%, transparent));
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: gh-draw 1.5s 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+/* The bar gradient runs bright -> deep per bar (objectBoundingBox), so every
+   bar has its own top-light falloff. Mint carries the secondary hue through
+   the area fill and matches the grid and stat icons in this section. */
+.gh-chart-bar {
+  fill: url(#ghBarFill);
+  transform-box: fill-box;
+  transform-origin: bottom;
+  transform: scaleY(0);
+  animation: gh-grow 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.gh-chart-bar.is-active {
+  fill: var(--gh-accent);
+}
+.gh-chart-dot {
+  fill: var(--panel);
+  stroke: var(--gh-accent-bright);
+  stroke-width: 2.4;
+  opacity: 0;
+  transition: opacity 0.2s, r 0.2s;
+}
+.gh-chart-dot.is-active {
+  opacity: 1;
+  r: 5.5;
+}
+.gh-chart-empty {
+  font: 400 12px var(--sans);
+  color: var(--gh-ink-soft);
+  margin: 0;
+  padding: 46px 18px;
+  text-align: center;
+  border: 1px dashed color-mix(in srgb, var(--line) 75%, transparent);
+  border-radius: 16px;
+  line-height: 1.6;
+}
+.gh-chart-hover {
+  position: absolute;
+  top: -8px;
+  transform: translate(-50%, -100%);
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gh-accent) 45%, transparent);
+  box-shadow: 0 12px 30px rgba(3, 14, 18, 0.35);
+  backdrop-filter: blur(12px);
+  font: 400 11px var(--mono);
+  color: var(--gh-ink);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 3;
+}
+.gh-chart-bars rect {
+  cursor: pointer;
+}
+
+/* -------------------------------------------------------------- calendar */
+
+.gh-legend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font: 400 10.5px var(--mono);
+  color: var(--gh-ink-faint);
+  letter-spacing: 0.04em;
+}
+.gh-legend .gh-cell {
+  width: 11px;
+  height: 11px;
+  min-width: 0;
+  border-radius: 3px;
+  aspect-ratio: auto;
+  animation: none;
+}
+.gh-calendar-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-width: 0;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+.gh-calendar {
+  display: grid;
+  grid-template-columns: repeat(var(--gh-weeks, 53), minmax(10px, 1fr));
+  grid-template-rows: repeat(7, auto);
+  gap: 3px;
+  padding: 2px;
+}
+.gh-cal-row {
+  display: contents;
+}
+.gh-cell {
+  display: block;
+  width: 100%;
+  min-width: 10px;
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--line) 26%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gh-accent) 7%, transparent);
+  transition: transform 0.16s, box-shadow 0.16s, background 0.16s;
+  animation: gh-pop 0.4s ease both;
+}
+.gh-cell[data-level="0"] {
+  background: color-mix(in srgb, var(--line) 30%, transparent);
+}
+.gh-cell[data-level="1"] {
+  background: color-mix(in srgb, var(--gh-accent) 28%, transparent);
+}
+.gh-cell[data-level="2"] {
+  background: color-mix(in srgb, var(--gh-accent) 50%, transparent);
+}
+.gh-cell[data-level="3"] {
+  background: color-mix(in srgb, var(--gh-accent) 76%, transparent);
+}
+.gh-cell[data-level="4"] {
+  background: var(--gh-accent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--gh-accent) 60%, transparent);
+}
+.gh-calendar .gh-cell:hover,
+.gh-calendar .gh-cell:focus-visible {
+  transform: scale(1.55);
+  box-shadow: 0 0 0 1.5px var(--gh-accent), 0 0 16px color-mix(in srgb, var(--gh-accent) 65%, transparent);
+  outline: none;
+  z-index: 2;
+}
+.gh-calendar .gh-cell:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 1px;
+}
+
+/* --------------------------------------------------------------- tooltip */
+
+.gh-tooltip {
+  position: absolute;
+  z-index: 40;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--panel) 95%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gh-accent) 45%, transparent);
+  box-shadow: 0 14px 34px rgba(3, 14, 18, 0.4);
+  backdrop-filter: blur(14px);
+  font: 400 11px var(--mono);
+  color: var(--gh-ink);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.16s, transform 0.16s;
+}
+.gh-tooltip.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------------------------------------------------------- unavailable */
+
+.gh-unavailable {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px dashed color-mix(in srgb, var(--orange) 50%, var(--line));
+  background: color-mix(in srgb, var(--orange) 7%, transparent);
+}
+.gh-unavailable svg {
+  width: 19px;
+  height: 19px;
+  color: var(--orange);
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+.gh-unavailable strong {
+  display: block;
+  font-size: 13.5px;
+  color: var(--gh-ink);
+  font-weight: 800 !important;
+  margin-bottom: 5px;
+  letter-spacing: -0.01em;
+}
+.gh-unavailable span {
+  font: 400 12px var(--sans);
+  color: var(--gh-ink-soft);
+  line-height: 1.7;
+  display: block;
+}
+
+/* ---------------------------------------------------------------- repos */
+
+.gh-repos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  /* 258px keeps two cards on a row inside the narrower repos column. */
+  grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+.gh-repo-link {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  height: 100%;
+  padding: 17px 18px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--panel-2) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  color: var(--gh-ink);
+  transition: transform 0.26s, border-color 0.26s, box-shadow 0.26s, background 0.26s;
+}
+.gh-repo-link:hover,
+.gh-repo-link:focus-visible {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--gh-accent) 52%, transparent);
+  background: color-mix(in srgb, var(--gh-accent) 9%, var(--panel-2));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--gh-accent) 20%, transparent), 0 18px 38px color-mix(in srgb, var(--gh-accent) 16%, transparent);
+  outline: none;
+}
+.gh-repo-link:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+}
+.gh-repo-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gh-repo-name {
+  font: 500 13.5px var(--mono);
+  font-weight: 500 !important;
+  color: var(--gh-accent);
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gh-repo-top svg {
+  width: 15px;
+  height: 15px;
+  margin-left: auto;
+  flex: 0 0 auto;
+  color: var(--gh-ink-faint);
+  transition: transform 0.24s, color 0.24s;
+}
+.gh-repo-link:hover .gh-repo-top svg {
+  transform: translate(2px, -2px);
+  color: var(--gh-accent);
+}
+.gh-repo-badge {
+  flex: 0 0 auto;
+  font: 400 9.5px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: var(--gh-ink-faint);
+  border: 1px solid color-mix(in srgb, var(--line) 90%, transparent);
+}
+.gh-repo-desc {
+  font: 400 12.5px var(--sans);
+  color: var(--gh-ink-soft);
+  line-height: 1.7;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  /* Reserve exactly two lines (line-height 1.7) so every card is the same
+     height whether the description wraps to two lines or only one. */
+  min-height: 3.4em;
+}
+.gh-repo-meta {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 3px;
+}
+.gh-repo-metric {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: 400 11px var(--mono);
+  color: var(--gh-ink-soft);
+}
+.gh-repo-metric svg {
+  width: 13px;
+  height: 13px;
+  color: var(--gh-ink-faint);
+}
+.gh-repo-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px currentColor;
+}
+.gh-repo-updated {
+  margin-left: auto;
+  color: var(--gh-ink-faint);
+}
+.gh-empty {
+  font: 400 12px var(--sans);
+  color: var(--gh-ink-soft);
+  margin: 0;
+  padding: 28px 0;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------- actions */
+
+.gh-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+.gh-actions .button {
+  border-radius: 999px;
+}
+
+/* ---------------------------------------------------------------- states */
+
+.gh-notice {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 26px;
+  border-radius: 26px;
+  border: 1px solid color-mix(in srgb, var(--orange) 45%, var(--line));
+  background: color-mix(in srgb, var(--orange) 8%, var(--panel));
+  backdrop-filter: blur(18px);
+}.gh-notice > svg {
+  width: 28px;
+  height: 28px;
+  color: var(--orange);
+  flex: 0 0 auto;
+}
+.gh-notice > div {
+  flex: 1 1 260px;
+}
+.gh-notice h3 {
+  margin: 0 0 7px;
+  font-size: 17px;
+  font-weight: 800 !important;
+  color: var(--gh-ink);
+  letter-spacing: -0.02em;
+}
+.gh-notice p {
+  margin: 0;
+  font: 400 13px var(--sans);
+  color: var(--gh-ink-soft);
+  line-height: 1.7;
+  max-width: 62ch;
+}
+.gh-retry {
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+
+.gh-skeleton {
+  display: grid;
+  gap: 16px;
+}
+.gh-skeleton-bar {
+  border-radius: 20px;
+  padding: 18px 20px;
+  display: flex;
+  gap: 14px;
+}
+.gh-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+  gap: 12px;
+}
+.gh-skeleton-block {
+  border-radius: 24px;
+  height: 230px;
+}
+.gh-skeleton span {
+  display: block;
+  border-radius: 12px;
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--line) 34%, transparent) 20%,
+    color-mix(in srgb, var(--gh-accent) 24%, transparent) 42%,
+    color-mix(in srgb, var(--line) 34%, transparent) 64%
+  );
+  background-size: 220% 100%;
+  animation: gh-shimmer 1.5s linear infinite;
+}
+.gh-skeleton-bar span {
+  height: 18px;
+  flex: 1;
+}
+.gh-skeleton-grid span {
+  height: 108px;
+}
+.gh-skeleton-block span {
+  height: 100%;
+}
+
+/* ------------------------------------------------------------ animations */
+
+@keyframes gh-rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes gh-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes gh-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+@keyframes gh-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes gh-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes gh-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--gh-accent) 18%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--gh-accent) 6%, transparent);
+  }
+}
+@keyframes gh-shimmer {
+  from {
+    background-position: 140% 0;
+  }
+  to {
+    background-position: -40% 0;
+  }
+}
+
+.gh-chart-bar:nth-child(1) { animation-delay: 0.35s; }
+.gh-chart-bar:nth-child(2) { animation-delay: 0.42s; }
+.gh-chart-bar:nth-child(3) { animation-delay: 0.49s; }
+.gh-chart-bar:nth-child(4) { animation-delay: 0.56s; }
+.gh-chart-bar:nth-child(5) { animation-delay: 0.63s; }
+.gh-chart-bar:nth-child(6) { animation-delay: 0.70s; }
+.gh-chart-bar:nth-child(7) { animation-delay: 0.77s; }
+.gh-chart-bar:nth-child(8) { animation-delay: 0.84s; }
+.gh-chart-bar:nth-child(9) { animation-delay: 0.91s; }
+.gh-chart-bar:nth-child(10) { animation-delay: 0.98s; }
+.gh-chart-bar:nth-child(11) { animation-delay: 1.05s; }
+.gh-chart-bar:nth-child(12) { animation-delay: 1.12s; }
+
+/* --------------------------------------------------------- accessibility */
+
+.gh-section :focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ------------------------------------------------------------ responsive */
+
+@media (max-width: 1080px) {
+  .nav-links {
+    gap: 15px;
+    font-size: 11px;
+  }
+}
+@media (max-width: 960px) {
+  .nav-links {
+    gap: 11px;
+    font-size: 10px;
+  }
+  .nav-links .resume-link {
+    padding: 7px 10px;
+  }
+}
+@media (max-width: 850px) {
+  .gh-section .section-heading {
+    margin-bottom: 44px;
+  }
+  .gh-dashboard {
+    padding: 20px;
+    border-radius: 24px;
+  }
+  .gh-panel {
+    padding: 20px 18px 16px;
+    border-radius: 20px;
+  }
+  .gh-stat {
+    padding: 15px 15px 13px;
+  }
+  .gh-repos {
+    grid-template-columns: 1fr;
+  }
+  .gh-notice {
+    padding: 20px;
+  }
+}
+@media (max-width: 480px) {
+  .gh-dashboard {
+    padding: 15px;
+    gap: 14px;
+  }
+  .gh-topbar {
+    padding: 14px 15px;
+  }
+  .gh-freshness {
+    font-size: 10px;
+  }
+  .gh-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gh-stat strong {
+    font-size: 27px;
+  }
+  .gh-actions .button {
+    flex: 1 1 100%;
+  }
+  .gh-chart-axis {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gh-section *,
+  .gh-section *::before,
+  .gh-section *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .gh-chart-line {
+    stroke-dashoffset: 0;
+  }
+  .gh-chart-bar {
+    transform: none;
+  }
+  .gh-stat:hover,
+  .gh-repo-link:hover {
+    transform: none;
+  }
+}

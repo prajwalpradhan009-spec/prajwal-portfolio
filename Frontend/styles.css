@@ -1481,7 +1481,9 @@ html[data-theme="dark"] .about-avatar::after {
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  /* Wide enough that the two cards read as separate projects rather than one
+     continuous panel, since both sit on the same panel colour. */
+  gap: 28px;
   align-items: stretch;
 }
 .project-card {
@@ -1502,8 +1504,8 @@ html[data-theme="dark"] .about-avatar::after {
 }
 .project-art {
   height: auto;
-  aspect-ratio: 16 / 10;
-  min-height: 290px;
+  aspect-ratio: 11 / 5;
+  min-height: 210px;
   position: relative;
   overflow: hidden;
 }
@@ -1643,18 +1645,17 @@ html[data-theme="dark"] .about-avatar::after {
   0%, 100% { transform: translateY(0) rotate(-2deg); }
   50% { transform: translateY(-9px) rotate(2deg); }
 }
-.novacart-logo {
-  width: 98px;
-  height: 98px;
-  display: grid;
-  place-items: center;
-  z-index: 1;
-  animation: northstar-pulse 3.5s ease-in-out infinite;
-}
-.novacart-logo svg {
-  width: 98px;
-  height: 98px;
-  filter: drop-shadow(0 0 14px rgba(105, 229, 225, 0.45));
+/* NovaCart is presented like Northstar: the artwork is the panel backdrop at
+   `cover`. The artwork is authored at 1320x600 (aspect 2.2) to match the panel's
+   11/5 ratio exactly, with the panel's own gradient filled around the logo, so
+   `cover` scales 546x248 with nothing cropped and the logo keeps its 1.48:1
+   proportions. Declared after .art-banking so it wins the cascade. */
+.art-shop {
+  background-color: #081b24;
+  background-image: url('novacart-logo.png'), radial-gradient(circle at 50% 45%, rgba(255, 171, 132, 0.14), transparent 32%), linear-gradient(rgba(105, 229, 225, 0.055) 1px, transparent 1px), linear-gradient(90deg, rgba(105, 229, 225, 0.055) 1px, transparent 1px);
+  background-size: cover, auto, 34px 34px, 34px 34px;
+  background-position: center, center, 0 0, 0 0;
+  background-repeat: no-repeat, no-repeat, repeat, repeat;
 }
 @keyframes jarvis-spin {
   from { transform: rotate(0deg); }
@@ -2180,7 +2181,6 @@ html[data-theme="dark"] .about-avatar::after {
   .jarvis-orb,
   .jarvis-scan,
   .shop-tile,
-  .novacart-logo,
   .toolkit-banner,
   .term-window,
   .term-body .term-caret,
@@ -2359,7 +2359,7 @@ html[data-theme="dark"] .about-avatar::after {
 }
 .project-info {
   flex: 1;
-  padding: 25px;
+  padding: 22px;
 }
 .project-info h3 {
   font-size: 24px;
@@ -2377,11 +2377,34 @@ html[data-theme="dark"] .about-avatar::after {
   gap: 6px;
   flex-wrap: wrap;
 }
+/* "Project In Progress" used to float over the NovaCart artwork as a badge. It
+   now sits in this row, so it keeps the row's pill shape and only takes the
+   orange accent (plus a dot) to read as a status rather than a technology. The
+   text is mixed toward --text so it darkens in light mode and stays legible,
+   where the raw --orange is too low contrast at 10px. */
+.project-tech .status-tag {
+  color: color-mix(in srgb, var(--orange) 72%, var(--text));
+  border-color: color-mix(in srgb, var(--orange) 45%, transparent);
+  background: color-mix(in srgb, var(--orange) 9%, transparent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.project-tech .status-tag::before {
+  content: "";
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--orange) 70%, transparent);
+}
 .text-link {
   background: none;
   border: 0;
   padding: 0;
-  margin-top: 25px;
+  margin-top: 20px;
   color: var(--mint);
   display: flex;
   align-items: center;

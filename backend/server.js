@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose'); // Added Mongoose
+const { registerGitHubRoutes } = require('./github');
 
 // Loads variables from .env file
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -73,6 +74,10 @@ app.get('/api/projects/:slug', (request, response) => {
 
 app.get('/api/skills', (request, response) => response.json(skills));
 
+// Live GitHub dashboard data. Credentials stay on the server; the response
+// only ever contains public profile data.
+registerGitHubRoutes(app);
+
 app.post('/api/contact', async (request, response) => {
   const contactData = validateContact(request.body);
   if (contactData.error) return response.status(400).json({ error: contactData.error });
@@ -109,6 +114,12 @@ async function startServer() {
     }
   } else {
     console.warn('MONGODB_URI is missing in .env file. API started without database access.');
+  }
+
+  if (process.env.GITHUB_USERNAME) {
+    console.log(`GitHub activity enabled for ${process.env.GITHUB_USERNAME} (${process.env.GITHUB_TOKEN ? 'authenticated' : 'public data only'}).`);
+  } else {
+    console.warn('GITHUB_USERNAME is missing in .env file. /api/github will report a configuration error.');
   }
 
   app.listen(port, '0.0.0.0', () => {
