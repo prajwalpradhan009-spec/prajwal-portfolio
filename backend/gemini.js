@@ -14,9 +14,9 @@
 
 const { GoogleGenAI } = require('@google/genai');
 
-// A moving alias keeps working across Gemini releases; set GEMINI_MODEL to pin
-// a specific model (for example gemini-2.5-flash) when you want a fixed one.
-const DEFAULT_MODEL = 'gemini-flash-latest';
+// Pinned to gemini-1.5-flash. Setting GEMINI_MODEL overrides this; leaving it
+// blank falls back to the value here.
+const DEFAULT_MODEL = 'gemini-1.5-flash';
 
 const REQUEST_TIMEOUT_MS = 20000;
 const MAX_OUTPUT_TOKENS = 800;

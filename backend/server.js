@@ -173,7 +173,7 @@ async function startServer() {
   }
 
   if (isGeminiConfigured()) {
-    console.log(`Prajwal AI enabled (model: ${String(process.env.GEMINI_MODEL || '').trim() || 'gemini-flash-latest'}).`);
+    console.log(`Prajwal AI enabled (model: ${String(process.env.GEMINI_MODEL || '').trim() || 'gemini-1.5-flash'}).`);
   } else {
     console.warn(`GEMINI_API_KEY is not set, so /api/chat will report that Prajwal AI is unavailable. ${CONFIG_HINT}`);
   }
