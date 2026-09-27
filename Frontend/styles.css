@@ -45,7 +45,19 @@
 }
 html {
   scroll-behavior: smooth;
+  /* The header is fixed, so without this every in-page jump parks the section
+     heading underneath it. script.js keeps --header-offset in sync with the
+     real header height; the fallback covers the moment before it runs and any
+     load where scripting is unavailable. */
+  scroll-padding-top: calc(var(--header-offset, 76px) + 14px);
   -webkit-tap-highlight-color: transparent;
+}
+/* A scripted scroll drives window.scrollTo on every frame. Leaving the native
+   smooth behaviour enabled would make the browser animate each of those
+   individual steps too, so the scroll position lags behind the easing curve.
+   The class is added for the duration of the animation only. */
+html.is-programmatic-scroll {
+  scroll-behavior: auto !important;
 }
 a,
 button,
@@ -3501,6 +3513,21 @@ html[data-theme="dark"] .skill-caption {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  /* Both of these move the viewport, which is exactly what the preference asks
+     to be spared. The reveal classes are shown outright rather than merely
+     transitioned instantly: that way the content is never dependent on the
+     IntersectionObserver firing before it becomes readable, which is the one
+     failure mode a "no animation" fallback must not have. */
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal,
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
   .project-showcase,
   .project-showcase::before,
   .project-media img,

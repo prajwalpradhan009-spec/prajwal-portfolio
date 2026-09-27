@@ -132,6 +132,126 @@ window.addEventListener(
 window.addEventListener('touchstart', markScrolling, { passive: true });
 window.addEventListener('wheel', markScrolling, { passive: true });
 
+/* ------------------------------------------------- smooth in-page scrolling */
+
+// `scroll-behavior: smooth` alone is not enough here. The browser's own smooth
+// scroll has a fixed duration that does not scale with distance, it cannot be
+// interrupted, and on touch devices it fights the momentum scrolling that
+// makes a phone feel native: once a long jump starts, a finger on the screen
+// does nothing until it finishes. Driving the scroll from a requestAnimationFrame
+// loop fixes all three. The duration still scales with the distance travelled,
+// the loop bails out the instant the visitor takes over, and the easing is the
+// same accelerate-then-settle curve used elsewhere on the page.
+const scrollRoot = document.documentElement;
+const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+const siteHeader = document.querySelector('.site-header');
+
+// Bumped on every new scroll and on every cancellation. The animation loop
+// compares the token it captured against this one and stops when they differ,
+// which is what makes a scroll interruptible.
+let scrollToken = 0;
+
+// The header is fixed and its height depends on the type scale, so the offset
+// is measured rather than assumed. Publishing it as a custom property keeps the
+// CSS `scroll-padding-top` in step with the same number, so the scripted jump
+// and the no-scripting native fallback agree.
+function syncHeaderOffset() {
+  if (!siteHeader) return 76;
+  const height = Math.ceil(siteHeader.getBoundingClientRect().height);
+  if (height <= 0) return 76;
+  scrollRoot.style.setProperty('--header-offset', `${height}px`);
+  return height;
+}
+let headerOffset = syncHeaderOffset();
+// Zoom, a rotating phone and the mobile URL bar appearing all resize the
+// viewport, and with it the header.
+window.addEventListener('resize', () => { headerOffset = syncHeaderOffset(); }, { passive: true });
+
+// Ease-in-out cubic: quick to set off, gentle through the middle, soft landing.
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+}
+
+function stopProgrammaticScroll() {
+  scrollToken += 1;
+  scrollRoot.classList.remove('is-programmatic-scroll');
+}
+
+function animateScrollTo(targetY) {
+  const startY = window.scrollY;
+  const distance = targetY - startY;
+  if (Math.abs(distance) < 2) return;
+
+  const token = (scrollToken += 1);
+  scrollRoot.classList.add('is-programmatic-scroll');
+
+  // 320ms for a short hop, capped at 760ms for the whole page, so a long jump
+  // never turns into a wait.
+  const duration = Math.min(760, Math.max(320, Math.abs(distance) * 0.4));
+  const startTime = performance.now();
+
+  const step = now => {
+    if (token !== scrollToken) return;
+    const progress = Math.min((now - startTime) / duration, 1);
+    window.scrollTo(0, startY + distance * easeInOutCubic(progress));
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    } else {
+      scrollRoot.classList.remove('is-programmatic-scroll');
+    }
+  };
+  requestAnimationFrame(step);
+}
+
+function scrollToTarget(target, hash) {
+  // Measured again per jump: the header is fixed, but its height can change
+  // between clicks and a stale offset would park the heading underneath it.
+  headerOffset = syncHeaderOffset();
+  // getBoundingClientRect is viewport-relative, so this is the absolute
+  // document position the target should rest at, clear of the fixed header.
+  const targetY = Math.max(0, Math.round(window.scrollY + target.getBoundingClientRect().top - (headerOffset + 14)));
+
+  // Update the address bar without the browser performing its own jump.
+  if (hash && window.history.pushState) window.history.pushState(null, '', hash);
+
+  if (reduceMotionQuery.matches) {
+    stopProgrammaticScroll();
+    window.scrollTo(0, targetY);
+  } else {
+    animateScrollTo(targetY);
+  }
+
+  // Without this the next Tab press continues from the link that was clicked
+  // instead of from the section that was just revealed, so keyboard and screen
+  // reader users are sent back to the top of the page.
+  if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+  target.focus({ preventScroll: true });
+}
+
+// Delegated so it covers every in-page link, including the hero buttons and the
+// brand mark, not just the nav.
+document.addEventListener('click', event => {
+  // Let modified clicks (new tab, download) behave normally.
+  if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  const anchor = event.target.closest('a[href^="#"]');
+  if (!anchor) return;
+
+  const hash = anchor.getAttribute('href');
+  if (!hash || hash === '#') return;
+  const target = document.getElementById(decodeURIComponent(hash.slice(1)));
+  if (!target) return;
+
+  event.preventDefault();
+  scrollToTarget(target, hash);
+});
+
+// Any deliberate scroll input hands control straight back to the visitor.
+for (const type of ['wheel', 'touchstart', 'keydown', 'pointerdown']) {
+  window.addEventListener(type, () => {
+    if (scrollRoot.classList.contains('is-programmatic-scroll')) stopProgrammaticScroll();
+  }, { passive: true });
+}
+
 // Highlight the nav link for whichever section currently occupies the middle of
 // the screen. The rootMargin shrinks the observed area to a band around the
 // middle, so the active link changes when a section reaches the centre rather
