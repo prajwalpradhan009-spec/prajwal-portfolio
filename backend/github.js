@@ -486,4 +486,4 @@ function registerGitHubRoutes(app) {
   });
 }
 
-module.exports = { registerGitHubRoutes, getGitHubActivity, GitHubError };
+module.exports = { registerGitHubRoutes };

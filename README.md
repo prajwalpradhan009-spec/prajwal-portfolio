@@ -31,15 +31,22 @@ A fast, responsive developer portfolio built with plain HTML, CSS and JavaScript
 │   ├── resume.html      Resume page
 │   ├── styles.css       Responsive styles, themes and animations
 │   ├── github.css       GitHub Activity dashboard styles
+│   ├── chat.css         Prajwal AI assistant styles
 │   ├── script.js        Interactions, project cards and contact logic
 │   ├── github.js        GitHub dashboard: fetch, states, chart, calendar
+│   ├── chat.js          Prajwal AI assistant: panel, conversation, rendering
 │   ├── config.js        Frontend API URL configuration
 │   ├── profile.jpg      Navbar profile logo
 │   ├── img.png          About section photo
+│   ├── novacart-logo.png  NovaCart project logo
+│   ├── northstarlogo.png Northstar project logo
 │   └── README.md        Frontend-specific notes
 ├── backend/
 │   ├── server.js        Express API and static file server
 │   ├── github.js        GitHub API client, cache and /api/github route
+│   ├── chat.js          POST /api/chat route, validation and rate limiting
+│   ├── gemini.js        Google Gemini service and error mapping
+│   ├── rateLimit.js     In-memory rate limiter for the chat endpoint
 │   ├── .env.example     Environment variable template
 │   ├── package.json     Backend scripts and dependencies
 │   └── data/

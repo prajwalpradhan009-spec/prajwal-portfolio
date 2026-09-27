@@ -62,7 +62,8 @@ html[data-theme="dark"] .gh-bg {
     linear-gradient(90deg, rgba(105, 229, 225, 0.11) 1px, transparent 1px);
 }
 
-/* Floating code fragments, same idea as the hero particles. */
+/* Floating code fragments, same idea as the hero particles. They fade out
+   below the header band so the digits never read as calendar data. */
 .gh-particles {
   position: absolute;
   inset: 0;
@@ -70,6 +71,8 @@ html[data-theme="dark"] .gh-bg {
   pointer-events: none;
   overflow: hidden;
   opacity: 0.5;
+  -webkit-mask-image: linear-gradient(180deg, #000 0 30%, transparent 52%);
+  mask-image: linear-gradient(180deg, #000 0 30%, transparent 52%);
 }
 .gh-particles span {
   position: absolute;
@@ -84,14 +87,14 @@ html[data-theme="dark"] .gh-particles span {
   content: "0 1 0\\A 1 0 1\\A const()";
   white-space: pre;
 }
-.gh-particles span:nth-child(1) { left: 8%; top: 62%; animation-delay: -1.5s; }
-.gh-particles span:nth-child(2) { left: 18%; top: 78%; animation-delay: -4.5s; }
-.gh-particles span:nth-child(3) { left: 31%; top: 68%; animation-delay: -2.5s; }
-.gh-particles span:nth-child(4) { left: 44%; top: 82%; animation-delay: -6.5s; }
-.gh-particles span:nth-child(5) { left: 57%; top: 64%; animation-delay: -3.5s; }
-.gh-particles span:nth-child(6) { left: 69%; top: 79%; animation-delay: -5.5s; }
-.gh-particles span:nth-child(7) { left: 81%; top: 66%; animation-delay: -7.5s; }
-.gh-particles span:nth-child(8) { left: 91%; top: 84%; animation-delay: -2.8s; }
+.gh-particles span:nth-child(1) { left: 6%; top: 30%; animation-delay: -1.5s; }
+.gh-particles span:nth-child(2) { left: 17%; top: 13%; animation-delay: -4.5s; }
+.gh-particles span:nth-child(3) { left: 29%; top: 34%; animation-delay: -2.5s; }
+.gh-particles span:nth-child(4) { left: 43%; top: 19%; animation-delay: -6.5s; }
+.gh-particles span:nth-child(5) { left: 57%; top: 36%; animation-delay: -3.5s; }
+.gh-particles span:nth-child(6) { left: 69%; top: 15%; animation-delay: -5.5s; }
+.gh-particles span:nth-child(7) { left: 81%; top: 32%; animation-delay: -7.5s; }
+.gh-particles span:nth-child(8) { left: 92%; top: 21%; animation-delay: -2.8s; }
 
 .gh-section > .container {
   position: relative;
@@ -197,6 +200,15 @@ html[data-theme="dark"] .gh-chart-panel {
 .gh-panel {
   border-radius: 24px;
   padding: 24px 24px 20px;
+}
+/* The calendar is dense with small squares, so it gets a near-opaque surface.
+   Without this the decorative code fragments behind the section read as
+   numbers inside the grid. */
+.gh-calendar-panel {
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+}
+html[data-theme="dark"] .gh-calendar-panel {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--panel-2) 94%, transparent), color-mix(in srgb, var(--panel) 88%, transparent));
 }
 .gh-panel-head {
   display: flex;

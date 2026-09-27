@@ -1,4 +1,6 @@
 # Environment variables - NEVER commit these
+# Covers the Gemini key, the GitHub token and the MongoDB connection string.
+# These patterns match at any depth, so backend/.env is covered too.
 .env
 *.env
 .env.*

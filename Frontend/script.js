@@ -132,36 +132,6 @@ function animateCounts() {
   });
 }
 
-const modal = document.querySelector('.modal');
-const modalTitle = document.querySelector('#modal-title');
-const modalBody = document.querySelector('.modal-body');
-const projectDescriptions = {
-  'Northstar File Studio': 'A polished desktop utility for merging PDFs and converting, compressing and organizing images. It turns repetitive file work into a clear, focused workflow with practical controls and dependable output.',
-  'NovaCart': 'NovaCart is a complete E-commerce experience: product browsing with search and categories, a working cart and a smooth checkout flow. Built end to end with a focus on clear UI, responsive layouts and a dependable shop API — all under one clean brand.',
-};
-const projectStacks = {
-  'Northstar File Studio': ['Python', 'CustomTkinter', 'Pillow'],
-  'NovaCart': ['React', 'Node.js', 'MongoDB'],
-};
-const featuredProject = document.querySelector('.project-card.featured');
-document.querySelectorAll('.art-weather, .art-notes').forEach(art => art.closest('.project-card')?.remove());
-if (featuredProject) {
-  featuredProject.innerHTML = `<div class="project-art art-northstar"><div class="northstar-tools"><i data-lucide="file-up"></i><i data-lucide="image"></i><i data-lucide="download"></i></div></div><div class="project-info"><span class="project-number">01 / Featured</span><h3>Northstar File Studio</h3><p>Merge PDFs. Convert images. Keep file work simple.</p><div class="project-actions"><button class="text-link project-open" data-project="Northstar File Studio"><span>View details</span><i data-lucide="arrow-up-right"></i></button><a class="text-link project-github" href="https://github.com/prajwalpradhan009-spec/-Northstar-Compress-PDF" target="_blank" rel="noreferrer"><span>GitHub</span><i data-lucide="github"></i></a><a class="text-link project-download" href="https://github.com/prajwalpradhan009-spec/-Northstar-Compress-PDF/archive/refs/heads/main.zip"><span>Download</span><i data-lucide="download"></i></a></div></div>`;
-  featuredProject.insertAdjacentHTML('afterend', `<article class="project-card banking-project reveal reveal-delay"><div class="project-art art-banking art-shop"><div class="jarvis-scan"></div><div class="shop-tile tile-1"><i data-lucide="shopping-bag"></i></div><div class="shop-tile tile-2"><i data-lucide="package"></i></div><div class="shop-tile tile-3"><i data-lucide="tag"></i></div><strong>NOVACART</strong><small>E-COMMERCE</small></div><div class="project-info"><span class="project-number">02 / Experiment</span><h3>NovaCart</h3><p>A complete online store — browse products, build your cart and check out through a clean, responsive shopping flow.</p><div class="project-tech"><span class="status-tag">Project In Progress</span></div><div class="project-actions"><button class="text-link project-open" data-project="NovaCart"><span>View details</span><i data-lucide="arrow-up-right"></i></button><a class="text-link project-github" href="https://github.com/prajwalpradhan009-spec" target="_blank" rel="noreferrer"><span>GitHub</span><i data-lucide="github"></i></a></div></div></article>`);
-  featuredProject.nextElementSibling.classList.add('visible');
-  lucide.createIcons();
-}
-document.querySelectorAll('.project-open').forEach(button => button.addEventListener('click', () => {
-  modalTitle.textContent = button.dataset.project;
-  modalBody.textContent = projectDescriptions[button.dataset.project];
-  document.querySelector('.modal-stack').innerHTML = projectStacks[button.dataset.project].map(technology => `<span>${technology}</span>`).join('');
-  modal.classList.add('open');
-}));
-function closeModal() { modal.classList.remove('open'); }
-document.querySelector('.modal-close').addEventListener('click', closeModal);
-modal.addEventListener('click', event => { if (event.target === modal) closeModal(); });
-document.addEventListener('keydown', event => { if (event.key === 'Escape') closeModal(); });
-
 document.querySelector('.contact-form').addEventListener('submit', event => {
   event.preventDefault();
   const form = event.target;
@@ -182,8 +152,7 @@ document.querySelector('.contact-form').addEventListener('submit', event => {
     body: JSON.stringify(payload)
   }).then(response => {
     if (!response.ok) throw new Error('Unable to send');
-    return response.json();
-  }).then(result => {
+  }).then(() => {
     message.textContent = 'Successful! Your message has been sent.';
     form.classList.add('is-sent');
     form.reset();

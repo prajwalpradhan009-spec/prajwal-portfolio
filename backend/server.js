@@ -1,13 +1,32 @@
 const path = require('node:path');
 const fs = require('node:fs/promises');
+const dns = require('node:dns');
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose'); // Added Mongoose
 const { registerGitHubRoutes } = require('./github');
+const { registerChatRoutes, isGeminiConfigured } = require('./chat');
 
 // Loads variables from .env file
 dotenv.config({ path: path.join(__dirname, '.env') });
+
+// A `mongodb+srv://` URI is resolved with dns.resolveSrv, which uses the c-ares
+// resolver rather than the operating system one. On machines where c-ares
+// reports an unusable nameserver (for example a stale 127.0.0.1 entry left by a
+// proxy or VPN client) every lookup fails with ECONNREFUSED even though the
+// network is fine. DNS_SERVERS (comma separated) overrides that resolver, so a
+// broken local configuration can be corrected from .env without a code change.
+// It is unset on Render, where the default resolver already works.
+const dnsServers = String(process.env.DNS_SERVERS || '')
+  .split(',')
+  .map(server => server.trim())
+  .filter(Boolean);
+
+if (dnsServers.length) {
+  dns.setServers(dnsServers);
+  console.log(`DNS resolver overridden with ${dnsServers.join(', ')} for mongodb+srv lookups.`);
+}
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -25,7 +44,31 @@ const Contact = mongoose.model('Contact', contactSchema);
 
 let isDatabaseConnected = false;
 
-app.use(cors());
+// Render terminates TLS at its own proxy, so `request.ip` is only the real
+// visitor address when the first proxy hop is trusted. The chat rate limiter
+// relies on this to count visitors individually.
+app.set('trust proxy', 1);
+
+// CORS is open by default so the portfolio keeps working from any host, and can
+// be locked to specific origins with ALLOWED_ORIGINS (comma separated). Entries
+// may be written as bare hosts; they are normalised to https:// so a missing
+// scheme or a trailing slash cannot silently block the real origin.
+function normaliseOrigins(value) {
+  return String(value || '')
+    .split(',')
+    .map(origin => origin.trim().replace(/\/+$/, ''))
+    .filter(Boolean)
+    .map(origin => (/^https?:\/\//i.test(origin) ? origin : `https://${origin}`));
+}
+
+const allowedOrigins = normaliseOrigins(process.env.ALLOWED_ORIGINS);
+
+app.use(cors(allowedOrigins.length ? { origin: allowedOrigins } : {}));
+
+// Prajwal AI is registered before the shared JSON parser: the chat route
+// carries a conversation history and therefore sets its own, larger body limit.
+registerChatRoutes(app);
+
 app.use(express.json({ limit: '16kb' }));
 app.use(express.static(path.join(__dirname, '..', 'Frontend')));
 
@@ -120,6 +163,12 @@ async function startServer() {
     console.log(`GitHub activity enabled for ${process.env.GITHUB_USERNAME} (${process.env.GITHUB_TOKEN ? 'authenticated' : 'public data only'}).`);
   } else {
     console.warn('GITHUB_USERNAME is missing in .env file. /api/github will report a configuration error.');
+  }
+
+  if (isGeminiConfigured()) {
+    console.log(`Prajwal AI enabled (model: ${String(process.env.GEMINI_MODEL || '').trim() || 'gemini-flash-latest'}).`);
+  } else {
+    console.warn('GEMINI_API_KEY is missing in .env file. /api/chat will report that the assistant is unavailable.');
   }
 
   app.listen(port, '0.0.0.0', () => {

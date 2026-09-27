@@ -14,5 +14,11 @@ services:
         sync: false
       - key: GITHUB_CACHE_MINUTES
         value: 10
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-flash-latest
+      - key: CHAT_RATE_LIMIT
+        value: 20
       - key: PORT
         value: 3000

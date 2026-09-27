@@ -1,15 +1,17 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Prajwal Pradhan — BCA student and aspiring full-stack developer." />
   <title>Prajwal Pradhan | Full-Stack Developer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%2307141a'/%3E%3Cpath d='M11 4.2 12.3 7.9 16 9.2 12.3 10.5 11 14.2 9.7 10.5 6 9.2 9.7 7.9z' fill='%2369e5e1'/%3E%3Cpath d='M17.4 14.2 18 16 19.8 16.6 18 17.2 17.4 19 16.8 17.2 15 16.6 16.8 16z' fill='%23ffab84'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="github.css" />
+  <link rel="stylesheet" href="chat.css" />
 </head>
 <body>
   <div class="page-noise"></div>
@@ -116,7 +118,84 @@
 
     <section class="section container" id="education"><div class="section-heading split-heading reveal"><div><p class="eyebrow">03 / The path so far</p><h2>Learning in<br /><em>public.</em></h2></div><p class="heading-note">Every chapter adds a new<br />way of seeing the problem.</p></div><div class="timeline"><article class="timeline-item reveal"><span class="timeline-dot"></span><div class="timeline-meta"><i data-lucide="graduation-cap"></i>2025 — Present <span>Current</span></div><h3>Sikkim Alpine University</h3><small class="timeline-desc">Focused on learning web development end to end — HTML, CSS and JavaScript for the frontend, Node.js, Express and databases for the backend.<br />Currently exploring Python, web Tecnologies, API design and deployment so I can build full products on my own.<br />Every project teaches me something new — responsive layouts, clean architecture, debugging and shipping.<br />I learn by building: small experiments, real tools and a lot of curiosity.<br />Right now I'm going deeper into Python, Node.js and understanding how the web really works.</small><div class="timeline-tags"><span>Web Development</span><span>Python</span><span>Node.js</span></div></article><article class="timeline-item reveal reveal-delay"><span class="timeline-dot"></span><div class="timeline-meta"><i data-lucide="school"></i>Completed 2025</div><h3>Government Senior Secondary School, Rhenock</h3><p class="timeline-deg">Higher Secondary</p><small class="timeline-desc">Where the curiosity began: a first spark for technology, problem-solving and making things from scratch — taking machines apart, exploring how software works and writing a very first lines of code.</small><div class="timeline-tags"><span>Information Technology</span><span>Mathematics</span><span>DBMS</span><span>First Code</span></div></article></div></section>
 
-    <section class="section section-tint" id="projects"><div class="container"><div class="section-heading split-heading reveal"><div><p class="eyebrow">04 / Selected work</p><h2>Ideas, made<br /><em>real.</em></h2></div><p class="heading-note">A few experiments and projects<br />I’m proud to have shipped.</p></div><div class="projects-grid"><article class="project-card featured reveal"><div class="project-art art-dashboard"><div class="mini-top"><span></span><span></span><span></span></div><div class="mini-chart"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="mini-sidebar"><b>OVERVIEW</b><span></span><span></span><span></span></div></div><div class="project-info"><span class="project-number">01 / Featured</span><h3>Campus Connect</h3><p>A student-first platform to discover events, connect with peers and keep campus life in one place.</p><div class="project-tech"><span>React</span><span>Node.js</span><span>MongoDB</span></div><button class="text-link project-open" data-project="Campus Connect"><span>View details</span><i data-lucide="arrow-up-right"></i></button></div></article><article class="project-card reveal reveal-delay"><div class="project-art art-weather"><i data-lucide="cloud-sun"></i><b>24°</b><span>West Bengal, IN</span></div><div class="project-info"><span class="project-number">02 / Experiment</span><h3>Weatherly</h3><p>A clean weather dashboard designed around calm, glanceable information.</p><div class="project-tech"><span>JavaScript</span><span>API</span></div><button class="text-link project-open" data-project="Weatherly"><span>View details</span><i data-lucide="arrow-up-right"></i></button></div></article><article class="project-card reveal"><div class="project-art art-notes"><i data-lucide="notebook-pen"></i><span>ideas worth<br /><b>keeping.</b></span></div><div class="project-info"><span class="project-number">03 / Experiment</span><h3>Mindful Notes</h3><p>A focused notes space for collecting thoughts without the noise.</p><div class="project-tech"><span>HTML / CSS</span><span>Firebase</span></div><button class="text-link project-open" data-project="Mindful Notes"><span>View details</span><i data-lucide="arrow-up-right"></i></button></div></article></div></div></section>
+    <section class="section section-tint" id="projects">
+      <div class="container">
+        <div class="section-heading split-heading reveal">
+          <div>
+            <p class="eyebrow">04 / Selected work</p>
+            <h2>Featured<br /><em>Projects.</em></h2>
+          </div>
+          <p class="heading-note">Things I&rsquo;ve built with code.</p>
+        </div>
+
+        <div class="projects-showcase">
+          <article class="project-showcase project-showcase-featured reveal">
+            <div class="project-media">
+              <span class="project-flag">Featured Project</span>
+              <img src="novacart-logo.png" alt="NovaCart storefront preview" loading="lazy" />
+              <span class="project-media-grid" aria-hidden="true"></span>
+            </div>
+            <div class="project-body">
+              <div class="project-head">
+                <span class="project-index">01</span>
+                <span class="project-category">Full-Stack E-Commerce</span>
+              </div>
+              <h3>NovaCart</h3>
+              <p>A modern full-stack e-commerce platform with product browsing, user/admin functionality, product management, database integration, and REST API architecture.</p>
+              <ul class="project-stack">
+                <li>React</li>
+                <li>JavaScript</li>
+                <li>Node.js</li>
+                <li>Express.js</li>
+                <li>MySQL</li>
+                <li>REST API</li>
+                <li>HTML</li>
+                <li>CSS</li>
+              </ul>
+              <div class="project-links">
+                <!-- Live Demo: paste the deployed URL into the href below to enable this link. -->
+                <a class="project-btn project-btn-demo is-pending" data-live-url="" title="Live demo coming soon" aria-disabled="true" tabindex="-1">Live Demo <i data-lucide="arrow-up-right"></i></a>
+                <a class="project-btn" href="https://github.com/prajwalpradhan009-spec/E-com-NovaCart" target="_blank" rel="noreferrer">GitHub <i data-lucide="github"></i></a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-showcase project-showcase-secondary reveal reveal-delay">
+            <div class="project-media">
+              <img src="northstarlogo.png" alt="Northstar PDF Merger preview" loading="lazy" />
+              <span class="project-media-grid" aria-hidden="true"></span>
+            </div>
+            <div class="project-body">
+              <div class="project-head">
+                <span class="project-index">02</span>
+                <span class="project-category">Full-Stack Web Application</span>
+              </div>
+              <h3>Northstar PDF Merger</h3>
+              <p>A modern PDF and file utility web application that allows users to merge PDF files and perform document/file processing through a clean and user-friendly interface.</p>
+              <ul class="project-stack">
+                <li>HTML</li>
+                <li>CSS</li>
+                <li>JavaScript</li>
+                <li>Node.js</li>
+                <li>MongoDB</li>
+                <li>REST API</li>
+              </ul>
+              <div class="project-links">
+                <!-- Live Demo: paste the deployed URL into the href below to enable this link. -->
+                <a class="project-btn project-btn-demo is-pending" data-live-url="" title="Live demo coming soon" aria-disabled="true" tabindex="-1">Live Demo <i data-lucide="arrow-up-right"></i></a>
+                <a class="project-btn" href="https://github.com/prajwalpradhan009-spec/-Northstar-Compress-PDF" target="_blank" rel="noreferrer">GitHub <i data-lucide="github"></i></a>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="projects-more reveal">
+          <h3>Want to see more?</h3>
+          <p>Explore my GitHub for more development activity and repositories.</p>
+          <a class="button button-primary" href="https://github.com/prajwalpradhan009-spec" target="_blank" rel="noreferrer"><span>View GitHub</span> <i data-lucide="arrow-right"></i></a>
+        </div>
+      </div>
+    </section>
 
     <section class="section section-tint gh-section" id="github" data-github-activity aria-busy="true">
       <div class="gh-bg" aria-hidden="true"></div>
@@ -225,7 +304,78 @@
     <section class="contact-section" id="contact"><div class="container contact-grid"><div class="contact-copy reveal"><p class="eyebrow">07 / Say hello</p><h2>Have an idea?<br /><em>Let’s build it.</em></h2><p>Whether it’s a project, a collaboration, or just a good conversation about technology, my inbox is open.</p><a class="email-link" href="mailto:prajwalpradhan009@gmail.com">prajwalpradhan009@gmail.com <i data-lucide="arrow-up-right"></i></a></div><form class="contact-form reveal reveal-delay"><label>Your name<input type="text" placeholder="Jane Doe" required /></label><label>Email address<input type="email" placeholder="jane@example.com" required /></label><label>Tell me about it<textarea placeholder="A little about your idea..." rows="4" required></textarea></label><button class="button button-primary" type="submit">Send message <i data-lucide="send"></i></button><p class="form-message" aria-live="polite"></p></form></div></section>
   </main>
   <footer class="footer container"><span>© 2025 Prajjwal Pradhan</span><span>Designed & built with intention.</i></a></footer>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal-panel"><button class="modal-close" aria-label="Close project details"><i data-lucide="x"></i></button><p class="eyebrow">Project details</p><h2 id="modal-title"></h2><p class="modal-body"></p><div class="modal-stack"><span>React.js</span><span>Node.js</span><span>MongoDB</span></div></div></div>
-  <script src="https://unpkg.com/lucide@latest"></script><script src="config.js"></script><script src="script.js"></script><script src="github.js"></script>
+
+  <!-- Prajwal AI — portfolio assistant. Markup only: chat.js owns the behaviour. -->
+  <div class="ai-root" data-ai-root>
+    <button class="ai-launcher" type="button" data-ai-toggle aria-expanded="false" aria-controls="ai-panel" aria-label="Open Prajwal AI assistant">
+      <svg class="ai-launcher-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 3.5 12.5 7.7 16.7 9.2 12.5 10.7 11 14.9 9.5 10.7 5.3 9.2 9.5 7.7z"></path><path d="M17.6 14.4 18.3 16.4 20.3 17.1 18.3 17.8 17.6 19.8 16.9 17.8 14.9 17.1 16.9 16.4z"></path></svg>
+      <svg class="ai-launcher-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+    </button>
+
+    <section class="ai-panel" id="ai-panel" data-ai-panel role="dialog" aria-label="Prajwal AI assistant" hidden>
+      <header class="ai-head">
+        <div class="ai-identity">
+          <span class="ai-avatar" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3.5 12.5 7.7 16.7 9.2 12.5 10.7 11 14.9 9.5 10.7 5.3 9.2 9.5 7.7z"></path><path d="M17.6 14.4 18.3 16.4 20.3 17.1 18.3 17.8 17.6 19.8 16.9 17.8 14.9 17.1 16.9 16.4z"></path></svg>
+            <span class="ai-online"></span>
+          </span>
+          <span class="ai-identity-text">
+            <strong class="ai-title">Prajwal AI</strong>
+            <small class="ai-subtitle">Your AI guide to Prajwal&rsquo;s portfolio</small>
+          </span>
+        </div>
+        <div class="ai-head-actions">
+          <span class="ai-online-label" data-ai-status>Online</span>
+          <button class="ai-icon-btn" type="button" data-ai-minimize aria-label="Minimize Prajwal AI">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path></svg>
+          </button>
+          <button class="ai-icon-btn" type="button" data-ai-close aria-label="Close Prajwal AI">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="ai-log" data-ai-log role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation with Prajwal AI" tabindex="0"></div>
+
+      <div class="ai-actions">
+        <p class="ai-actions-label">Quick actions</p>
+        <div class="ai-suggestions" data-ai-suggestions aria-label="Suggested questions">
+          <button class="ai-chip" type="button" data-ai-question="Who is Prajwal?">Who is Prajwal?</button>
+          <button class="ai-chip" type="button" data-ai-question="What are his skills?">What are his skills?</button>
+          <button class="ai-chip" type="button" data-ai-question="Show me his projects">Show me his projects</button>
+          <button class="ai-chip" type="button" data-ai-question="What is he currently learning?">What is he currently learning?</button>
+          <button class="ai-chip" type="button" data-ai-question="How can I contact him?">How can I contact him?</button>
+          <button class="ai-chip" type="button" data-ai-question="Tell me about NovaCart">Tell me about NovaCart</button>
+        </div>
+
+        <div class="ai-jumps" data-ai-jumps aria-label="Jump to a section">
+          <button class="ai-jump" type="button" data-ai-jump="projects">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4.5v15"></path><path d="m5.5 13 6.5 6.5 6.5-6.5"></path></svg>
+            View Projects
+          </button>
+          <button class="ai-jump" type="button" data-ai-jump="skills">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4.5v15"></path><path d="m5.5 13 6.5 6.5 6.5-6.5"></path></svg>
+            View Skills
+          </button>
+          <button class="ai-jump" type="button" data-ai-jump="contact">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4.5v15"></path><path d="m5.5 13 6.5 6.5 6.5-6.5"></path></svg>
+            Contact Prajwal
+          </button>
+        </div>
+      </div>
+
+      <form class="ai-composer" data-ai-form>
+        <div class="ai-composer-row">
+          <textarea class="ai-input" id="ai-input" data-ai-input rows="1" maxlength="2000" placeholder="Ask about Prajwal, his skills or projects…" aria-label="Message Prajwal AI" aria-describedby="ai-hint"></textarea>
+          <button class="ai-send" type="submit" data-ai-send aria-label="Send message" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10.5 13.5"></path><path d="M21 3l-6.8 18-3.7-7.5L3 9.8z"></path></svg>
+          </button>
+        </div>
+        <p class="ai-hint" id="ai-hint"><span>Enter to send · Shift + Enter for a new line</span><span class="ai-count" data-ai-count aria-live="polite"></span></p>
+      </form>
+    </section>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest"></script><script src="config.js"></script><script src="script.js"></script><script src="github.js"></script><script src="chat.js"></script>
 </body>
 </html>
