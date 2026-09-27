@@ -47,6 +47,12 @@
     "Sorry, I'm having trouble connecting right now. Please try again or use the contact section.";
   const RATE_LIMIT_ERROR =
     'Prajwal AI is answering a lot of questions right now. Please try again in a few minutes.';
+  // The Gemini free tier allows only a small number of requests per day, and
+  // that runs out for everyone at once. Saying so plainly is far more useful
+  // than "trouble connecting", and there is no point offering a retry button,
+  // because the next attempt will fail the same way.
+  const QUOTA_ERROR =
+    "Prajwal AI has used up its free question quota for today, so it is taking a break. Please try again tomorrow, or use the contact section.";
   const TOO_LONG_ERROR = `That message is too long. Please keep it under ${MAX_LENGTH} characters.`;
 
   const state = {
@@ -347,6 +353,26 @@
       if (response.status === 429) {
         typing.remove();
         addMessage('ai', RATE_LIMIT_ERROR, { error: true, retry: message });
+        return;
+      }
+
+      // The daily Gemini quota is reported as 503 with an "ai-rate-limited"
+      // code, which is easy to mistake for the server being down. Read the code
+      // so the visitor is told the truth instead of a connection error.
+      if (response.status === 503) {
+        let code = '';
+        try {
+          const body = await response.json();
+          code = body?.error?.code || '';
+        } catch {
+          // A non-JSON 503 is treated as a plain server problem below.
+        }
+        typing.remove();
+        if (code === 'ai-rate-limited') {
+          addMessage('ai', QUOTA_ERROR, { error: true });
+          return;
+        }
+        addMessage('ai', GENERIC_ERROR, { error: true, retry: message });
         return;
       }
 

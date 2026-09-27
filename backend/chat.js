@@ -25,7 +25,10 @@ const RATE_LIMIT = (() => {
   const configured = Number(process.env.CHAT_RATE_LIMIT);
   return {
     windowMs: 10 * 60 * 1000,
-    max: Number.isFinite(configured) ? Math.min(Math.max(configured, 1), 200) : 20,
+    // The default is deliberately low. Gemini's free tier only allows a small
+    // number of requests per day in total, so a generous per-visitor limit
+    // would let one visitor spend the whole daily budget in a few minutes.
+    max: Number.isFinite(configured) ? Math.min(Math.max(configured, 1), 200) : 5,
     message: 'Too many questions at once. Please try again in a few minutes.',
   };
 })();
@@ -77,6 +80,48 @@ const chatLimiter = createRateLimiter({
   keyFn: request => request.ip || request.socket?.remoteAddress || 'unknown',
 });
 
+/**
+ * Answer cache.
+ *
+ * The Gemini free tier allows only a handful of requests per day, which is far
+ * less than a portfolio page attracts, and the quick-action chips mean most
+ * visitors ask the same handful of questions. Caching the first question of a
+ * conversation means those repeat questions cost nothing after the first ask,
+ * which is the difference between the assistant working most of the day and
+ * being permanently out of quota.
+ *
+ * Only messages that arrive with no history are cached. A question asked mid
+ * conversation depends on what came before it, so a stored answer would be
+ * wrong in a different context. The cache lives in memory only: nothing is
+ * written to disk or the database, and it disappears when the server restarts.
+ */
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+const CACHE_MAX_ENTRIES = 200;
+const answerCache = new Map();
+
+function cacheKeyFor(message) {
+  return message.toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function readCachedAnswer(key) {
+  const hit = answerCache.get(key);
+  if (!hit) return null;
+  if (Date.now() - hit.at > CACHE_TTL_MS) {
+    answerCache.delete(key);
+    return null;
+  }
+  return hit.reply;
+}
+
+function writeCachedAnswer(key, reply) {
+  // Map preserves insertion order, so the oldest entry is the first key.
+  if (answerCache.size >= CACHE_MAX_ENTRIES) {
+    const oldest = answerCache.keys().next().value;
+    if (oldest !== undefined) answerCache.delete(oldest);
+  }
+  answerCache.set(key, { reply, at: Date.now() });
+}
+
 function registerChatRoutes(app) {
   app.post(
     '/api/chat',
@@ -90,8 +135,16 @@ function registerChatRoutes(app) {
         return response.status(400).json({ error: { code: 'invalid-request', message: error } });
       }
 
+      const cacheable = value.history.length === 0;
+      const cacheKey = cacheable ? cacheKeyFor(value.message) : null;
+      if (cacheKey) {
+        const cached = readCachedAnswer(cacheKey);
+        if (cached) return response.json({ reply: cached, cached: true });
+      }
+
       try {
         const reply = await generateReply(value);
+        if (cacheKey) writeCachedAnswer(cacheKey, reply);
         return response.json({ reply });
       } catch (chatError) {
         const status = chatError instanceof GeminiError ? chatError.status : 500;
