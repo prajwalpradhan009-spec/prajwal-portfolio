@@ -3675,3 +3675,93 @@ html[data-theme="dark"] .skill-caption {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Scroll performance
+   ---------------------------------------------------------------------------
+   Scrolling on a phone was visibly stuttery. The page runs a large number of
+   looping decorative animations and several blurred surfaces, both of which
+   compete for the frames that scrolling needs. The rules below only change
+   behaviour while the page is actually moving, so the design is untouched when
+   the page is at rest.
+*/
+
+/* While scrolling, hand the frames to the scroll itself. `is-scrolling` is
+   added by script.js on the first scroll/touch/wheel event and removed once
+   movement stops. Pausing an animation mid-flight freezes its current frame,
+   so nothing visibly jumps when it resumes. */
+.is-scrolling *,
+.is-scrolling *::before,
+.is-scrolling *::after {
+  animation-play-state: paused !important;
+}
+
+/* Tell the browser to leave off-screen sections alone. It skips their layout,
+   paint and the animations inside them until they are close to the viewport.
+   `contain-intrinsic-size` supplies a placeholder height so the scrollbar
+   length stays stable and does not jump while you are dragging it. */
+main section[id] {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+
+/* Per-section placeholder heights, measured at a 390px-wide viewport. Using one
+   flat number for every section would make the scrollbar grow or shrink as each
+   section first comes into view, which moves the content under the visitor's
+   finger. `auto` means the real height is remembered once a section has been
+   rendered, so this only affects the first pass through the page. */
+#home { contain-intrinsic-size: auto 1139px; }
+#about { contain-intrinsic-size: auto 1338px; }
+#skills { contain-intrinsic-size: auto 2414px; }
+#education { contain-intrinsic-size: auto 1147px; }
+#projects { contain-intrinsic-size: auto 1891px; }
+#github { contain-intrinsic-size: auto 2637px; }
+#services { contain-intrinsic-size: auto 1351px; }
+#contact { contain-intrinsic-size: auto 994px; }
+
+/* On touch devices and narrow screens the frosted-glass surfaces are the single
+   most expensive thing on the page: every blurred pixel has to be recomputed as
+   the content slides underneath, and these panels sit on top of scrolling text.
+   The blur is dropped wholesale and the translucency is compensated with a more
+   opaque background, so the surfaces still read as the same panels. Pointer
+   devices (desktop, laptops) keep the real blur. */
+@media (max-width: 850px), (hover: none), (pointer: coarse) {
+  * {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .site-header,
+  .site-header.scrolled,
+  .project-showcase,
+  .projects-more,
+  .gh-skeleton-bar,
+  .gh-skeleton-block,
+  .gh-dashboard,
+  .gh-stat,
+  .gh-panel,
+  .gh-tooltip,
+  .gh-notice {
+    background: color-mix(in srgb, var(--panel) 97%, transparent) !important;
+  }
+
+  .contact-form {
+    background: linear-gradient(158deg, color-mix(in srgb, var(--panel) 97%, transparent), color-mix(in srgb, var(--panel) 94%, transparent) 62%, color-mix(in srgb, var(--panel) 96%, transparent)) !important;
+  }
+
+  .ai-panel {
+    background: color-mix(in srgb, var(--panel) 99%, transparent) !important;
+  }
+
+  .ai-head {
+    background: linear-gradient(120deg, color-mix(in srgb, var(--mint) 16%, var(--panel)), color-mix(in srgb, var(--panel) 99%, transparent) 70%) !important;
+  }
+
+  /* The chart and calendar strip scroll horizontally; keep the momentum
+     scrolling that makes that feel native instead of a stepped drag. */
+  .gh-chart-scroll,
+  .gh-calendar-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+}
+

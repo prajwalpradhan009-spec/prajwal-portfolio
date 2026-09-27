@@ -70,15 +70,98 @@ const menuToggle = document.querySelector('.menu-toggle');
 const navLinks = document.querySelector('.nav-links');
 const navAnchors = document.querySelectorAll('.nav-links a:not(.resume-link)');
 
-window.addEventListener('scroll', () => {
-  header.classList.toggle('scrolled', window.scrollY > 30);
-  const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
-  const progress = scrollableHeight > 0 ? (window.scrollY / scrollableHeight) * 100 : 0;
-  document.documentElement.style.setProperty('--scroll-progress', `${progress}%`);
-  const sections = [...document.querySelectorAll('main section[id]')];
-  const current = sections.find(section => window.scrollY >= section.offsetTop - 180 && window.scrollY < section.offsetTop + section.offsetHeight - 180);
-  navAnchors.forEach(anchor => anchor.classList.toggle('active', current?.id === anchor.getAttribute('href').slice(1)));
-});
+// Scroll work used to run on every scroll event and re-read the offset of every
+// section each time. Those offsetTop/offsetHeight reads force a synchronous
+// layout, so the handler fought the compositor and produced visible stutter on
+// phones. Off-screen sections also report their placeholder height (see the
+// `content-visibility` rules in styles.css), which made cached offsets wrong, so
+// the section you are looking at is now tracked with an IntersectionObserver
+// instead. Only the header and the progress bar are handled here, and updates
+// are coalesced into a single requestAnimationFrame callback.
+let scrollFrameQueued = false;
+let lastScrollProgress = -1;
+let lastHeaderScrolled = null;
+let scrollIdleTimer = null;
+
+function applyScrollState() {
+  scrollFrameQueued = false;
+  const y = window.scrollY;
+
+  const isScrolled = y > 30;
+  if (isScrolled !== lastHeaderScrolled) {
+    header.classList.toggle('scrolled', isScrolled);
+    lastHeaderScrolled = isScrolled;
+  }
+
+  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = maxScroll > 0 ? Math.min(100, (y / maxScroll) * 100) : 0;
+  const roundedProgress = Math.round(progress * 10) / 10;
+  // Skip the style write when nothing meaningful changed: every write here
+  // invalidates style for the whole document.
+  if (roundedProgress !== lastScrollProgress) {
+    document.documentElement.style.setProperty('--scroll-progress', `${roundedProgress}%`);
+    lastScrollProgress = roundedProgress;
+  }
+}
+
+// The page runs dozens of decorative looping animations (glows, sweeps, shimmers,
+// pulses). They are pleasant when the page is still, but every one of them
+// competes with the compositor for the frames that scrolling needs, which is
+// what makes movement feel heavy on a phone. Pausing them for the duration of a
+// scroll keeps the motion exactly as designed the rest of the time and gives the
+// frames back to the scroll itself.
+function markScrolling() {
+  document.documentElement.classList.add('is-scrolling');
+  clearTimeout(scrollIdleTimer);
+  scrollIdleTimer = setTimeout(() => {
+    document.documentElement.classList.remove('is-scrolling');
+  }, 180);
+}
+
+window.addEventListener(
+  'scroll',
+  () => {
+    markScrolling();
+    if (scrollFrameQueued) return;
+    scrollFrameQueued = true;
+    requestAnimationFrame(applyScrollState);
+  },
+  { passive: true }
+);
+
+window.addEventListener('touchstart', markScrolling, { passive: true });
+window.addEventListener('wheel', markScrolling, { passive: true });
+
+// Highlight the nav link for whichever section currently occupies the middle of
+// the screen. The rootMargin shrinks the observed area to a band around the
+// middle, so the active link changes when a section reaches the centre rather
+// than the instant its edge appears.
+const scrollSections = [...document.querySelectorAll('main section[id]')];
+const sectionsInView = new Set();
+let lastActiveSection = null;
+
+function setActiveSection(id) {
+  if (id === lastActiveSection) return;
+  lastActiveSection = id;
+  navAnchors.forEach(anchor =>
+    anchor.classList.toggle('active', id === anchor.getAttribute('href').slice(1))
+  );
+}
+
+if (scrollSections.length) {
+  const sectionObserver = new IntersectionObserver(
+    entries => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) sectionsInView.add(entry.target.id);
+        else sectionsInView.delete(entry.target.id);
+      }
+      const current = scrollSections.find(section => sectionsInView.has(section.id));
+      setActiveSection(current ? current.id : null);
+    },
+    { rootMargin: '-25% 0px -55% 0px', threshold: 0 }
+  );
+  scrollSections.forEach(section => sectionObserver.observe(section));
+}
 
 menuToggle.addEventListener('click', () => {
   const isOpen = navLinks.classList.toggle('open');
