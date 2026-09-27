@@ -388,8 +388,10 @@
     } catch (error) {
       typing.remove();
       // The raw reason is kept out of the conversation on purpose: visitors
-      // only ever see the friendly line.
-      console.warn('[chat] Prajwal AI could not reply:', error && error.message ? error.message : error);
+      // only ever see the friendly line. It still goes to the console in full,
+      // because a network or CORS failure arrives as a TypeError with no status
+      // ("Failed to fetch") and there is no other way to tell those apart.
+      console.error('Chat API Error:', error);
       addMessage('ai', GENERIC_ERROR, { error: true, retry: message });
     } finally {
       setBusy(false);
