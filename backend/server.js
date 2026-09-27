@@ -145,8 +145,15 @@ app.post('/api/contact', async (request, response) => {
   }
 });
 
+// Values come from backend/.env in local development and from the host's
+// environment variable settings in production (Render's dashboard). The
+// warnings below name both places, because "missing in .env file" is
+// misleading on a host that never reads a .env file at all.
+const CONFIG_HINT =
+  'Set it in backend/.env for local development, or in the host dashboard (Render: Environment) for production.';
+
 async function startServer() {
-  // 3. Connect to MongoDB using the URI from your .env file
+  // 3. Connect to MongoDB using the URI from your environment
   if (mongoUri) {
     try {
       await mongoose.connect(mongoUri, { family: 4 });
@@ -156,19 +163,19 @@ async function startServer() {
       console.error("Database Connection Failed:", error.message);
     }
   } else {
-    console.warn('MONGODB_URI is missing in .env file. API started without database access.');
+    console.warn(`MONGODB_URI is not set, so the API started without database access and /api/contact will save to a local file instead. ${CONFIG_HINT}`);
   }
 
   if (process.env.GITHUB_USERNAME) {
     console.log(`GitHub activity enabled for ${process.env.GITHUB_USERNAME} (${process.env.GITHUB_TOKEN ? 'authenticated' : 'public data only'}).`);
   } else {
-    console.warn('GITHUB_USERNAME is missing in .env file. /api/github will report a configuration error.');
+    console.warn(`GITHUB_USERNAME is not set, so /api/github will report a configuration error. ${CONFIG_HINT}`);
   }
 
   if (isGeminiConfigured()) {
     console.log(`Prajwal AI enabled (model: ${String(process.env.GEMINI_MODEL || '').trim() || 'gemini-flash-latest'}).`);
   } else {
-    console.warn('GEMINI_API_KEY is missing in .env file. /api/chat will report that the assistant is unavailable.');
+    console.warn(`GEMINI_API_KEY is not set, so /api/chat will report that Prajwal AI is unavailable. ${CONFIG_HINT}`);
   }
 
   app.listen(port, '0.0.0.0', () => {

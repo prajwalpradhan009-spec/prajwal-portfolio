@@ -127,6 +127,47 @@ function buildContents(history, message) {
   return contents;
 }
 
+// Upstream statuses worth one more attempt. Google returns 503 UNAVAILABLE
+// ("high demand") fairly often under load, and a retry succeeds immediately,
+// so failing the visitor on the first response loses answers for no reason.
+// 400/401/403/404 are deliberately absent: those are configuration problems
+// and retrying them only burns time and quota.
+const RETRYABLE_STATUSES = new Set([429, 500, 502, 503, 504]);
+const MAX_ATTEMPTS = 3;
+const RETRY_BASE_DELAY_MS = 450;
+
+/**
+ * Runs `operation`, retrying transient upstream failures with a short backoff.
+ *
+ * The total time budget matters: the browser aborts the request after 30s, so
+ * the retries must never extend a failing call past that. A timeout is not
+ * retried (it has already spent the whole budget); the fast rejections that
+ * need retrying come back in well under a second.
+ */
+async function withRetry(operation, { totalBudgetMs = REQUEST_TIMEOUT_MS + 2000 } = {}) {
+  const deadline = Date.now() + totalBudgetMs;
+  let lastError;
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      if (error instanceof GeminiError) throw error;
+
+      const status = Number(error?.status ?? error?.code ?? error?.response?.status) || 0;
+      const timedOut = error?.name === 'AbortError' || error?.name === 'TimeoutError';
+      if (attempt === MAX_ATTEMPTS || timedOut || !RETRYABLE_STATUSES.has(status)) break;
+
+      const delay = RETRY_BASE_DELAY_MS * attempt;
+      if (Date.now() + delay >= deadline) break;
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+
+  throw lastError;
+}
+
 function mapGeminiError(error) {
   if (error instanceof GeminiError) return error;
 
@@ -134,7 +175,12 @@ function mapGeminiError(error) {
   const safeMessage = scrubSecrets(error?.message || 'Gemini request failed.');
 
   if (status === 429) {
-    return new GeminiError('ai-rate-limited', 'Gemini rate limit reached.', 503, { retryAfter: 30 });
+    // The free tier is a small daily quota, so this is usually "quota used up"
+    // rather than a burst. The detail key matches the one chat.js reads so the
+    // response actually carries a Retry-After header.
+    return new GeminiError('ai-rate-limited', 'Gemini request quota exhausted (HTTP 429).', 503, {
+      retryAfterSeconds: 30,
+    });
   }
   if (status === 400 || status === 401 || status === 403) {
     // Almost always an invalid key or an unavailable model name: a server
@@ -173,16 +219,18 @@ async function generateReply({ message, history = [] }) {
 
   let response;
   try {
-    response = await getClient(apiKey).models.generateContent({
-      model,
-      contents: buildContents(history, message),
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: TEMPERATURE,
-        maxOutputTokens: MAX_OUTPUT_TOKENS,
-        httpOptions: { timeout: REQUEST_TIMEOUT_MS },
-      },
-    });
+    response = await withRetry(() =>
+      getClient(apiKey).models.generateContent({
+        model,
+        contents: buildContents(history, message),
+        config: {
+          systemInstruction: SYSTEM_INSTRUCTION,
+          temperature: TEMPERATURE,
+          maxOutputTokens: MAX_OUTPUT_TOKENS,
+          httpOptions: { timeout: REQUEST_TIMEOUT_MS },
+        },
+      })
+    );
   } catch (error) {
     throw mapGeminiError(error);
   }
