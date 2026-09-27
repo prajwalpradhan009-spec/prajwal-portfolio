@@ -3711,8 +3711,8 @@ main section[id] {
    rendered, so this only affects the first pass through the page. */
 #home { contain-intrinsic-size: auto 1139px; }
 #about { contain-intrinsic-size: auto 1338px; }
-#skills { contain-intrinsic-size: auto 2414px; }
 #education { contain-intrinsic-size: auto 1147px; }
+#skills { contain-intrinsic-size: auto 2240px; }
 #projects { contain-intrinsic-size: auto 1891px; }
 #github { contain-intrinsic-size: auto 2637px; }
 #services { contain-intrinsic-size: auto 1351px; }
@@ -3740,7 +3740,9 @@ main section[id] {
   .gh-stat,
   .gh-panel,
   .gh-tooltip,
-  .gh-notice {
+  .gh-notice,
+  .sk-card,
+  .sk-graph {
     background: color-mix(in srgb, var(--panel) 97%, transparent) !important;
   }
 
