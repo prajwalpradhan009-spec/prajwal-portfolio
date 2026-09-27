@@ -182,18 +182,28 @@ async function fetchAllRepos(username, token) {
   return { repositories, totalsComplete: false };
 }
 
+/**
+ * No `from`/`to` arguments: GitHub then returns its own default window, which
+ * is exactly the one-year range github.com renders — 52 or 53 complete weeks
+ * ending today. Passing `from` explicitly makes GitHub pad the leading and
+ * trailing weeks out to full week boundaries, which adds square cells for days
+ * in the future that can only ever be 0. Those cells are not real activity, so
+ * the arguments are left off and GitHub's own range is rendered as-is.
+ */
 const CONTRIBUTIONS_QUERY = `
-  query PortfolioContributions($login: String!, $from: DateTime!) {
+  query PortfolioContributions($login: String!) {
     user(login: $login) {
-      contributionsCollection(from: $from) {
+      contributionsCollection {
         contributionCalendar {
           totalContributions
           weeks {
             firstDay
             contributionDays {
               contributionCount
-              contributionLevel
               date
+              color
+              contributionLevel
+              weekday
             }
           }
         }
@@ -203,14 +213,56 @@ const CONTRIBUTIONS_QUERY = `
   }
 `;
 
+const CONTRIBUTION_LEVELS = ['NONE', 'FIRST_QUARTILE', 'SECOND_QUARTILE', 'THIRD_QUARTILE', 'FOURTH_QUARTILE'];
+
+/**
+ * GitHub's documented five-step colour scale. This is GitHub's own fixed
+ * palette, not invented data, and is only consulted for a step that GitHub
+ * itself omitted from the response (for example an account with no activity at
+ * a given intensity, where that step is never sent).
+ */
+const CONTRIBUTION_LEVEL_FALLBACK_COLORS = ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
+
 function contributionLevelToNumber(level) {
-  if (typeof level === 'number') return Math.min(Math.max(level, 0), 4);
-  return { NONE: 0, FIRST_QUARTILE: 1, SECOND_QUARTILE: 2, THIRD_QUARTILE: 3, QUARTILE: 4 }[level] ?? 0;
+  const index = CONTRIBUTION_LEVELS.indexOf(level);
+  return index === -1 ? 0 : index;
 }
 
-function summariseWeeks(weeks) {
+function isHexColor(value) {
+  return typeof value === 'string' && /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.trim());
+}
+
+/**
+ * Builds the "Less / More" legend from the colours GitHub actually sent,
+ * indexed by contribution level so the five swatches keep GitHub's own order
+ * and scale rather than a hand-picked set.
+ */
+function buildLegendPalette(weeks) {
+  const seen = new Map();
+  for (const week of weeks) {
+    for (const day of week.contributionDays) {
+      if (!isHexColor(day.color)) continue;
+      const level = contributionLevelToNumber(day.contributionLevel);
+      if (!seen.has(level)) seen.set(level, day.color.trim());
+    }
+  }
+  return CONTRIBUTION_LEVELS.map((name, level) => ({
+    level,
+    name,
+    color: seen.get(level) || CONTRIBUTION_LEVEL_FALLBACK_COLORS[level],
+  }));
+}
+
+/**
+ * Passes GitHub's own calendar structure straight through — every week keeps
+ * exactly the contributionDays GitHub returned, in the returned order, each
+ * with its real date, count, colour, level and weekday. Only the totals the
+ * dashboard tiles need are derived here; no day is ever added, dropped or
+ * back-filled with a zero that GitHub did not report.
+ */
+function summariseWeeks(calendar) {
+  const weeks = calendar.weeks;
   const days = [];
-  let total = 0;
   let activeDays = 0;
   let currentStreak = 0;
   let longestStreak = 0;
@@ -219,8 +271,7 @@ function summariseWeeks(weeks) {
   weeks.forEach(week => {
     week.contributionDays.forEach(day => {
       const count = Number(day.contributionCount) || 0;
-      days.push({ date: day.date, count, level: contributionLevelToNumber(day.contributionLevel) });
-      total += count;
+      days.push({ date: day.date, count });
       if (count > 0) {
         activeDays += 1;
         runningStreak += 1;
@@ -243,18 +294,22 @@ function summariseWeeks(weeks) {
   const totalLast7Days = days.filter(day => day.date >= weekAgo).reduce((sum, day) => sum + day.count, 0);
 
   return {
-    totalLastYear: total,
+    totalContributions: Number(calendar.totalContributions) || 0,
     totalLast30Days,
     totalLast7Days,
     activeDays,
     currentStreak,
     longestStreak,
+    // GitHub's own legend scale, taken from the colours it returned.
+    legend: buildLegendPalette(weeks),
     weeks: weeks.map(week => ({
-      start: week.firstDay,
-      days: week.contributionDays.map(day => ({
+      firstDay: week.firstDay,
+      contributionDays: week.contributionDays.map(day => ({
         date: day.date,
-        count: Number(day.contributionCount) || 0,
-        level: contributionLevelToNumber(day.contributionLevel),
+        contributionCount: Number(day.contributionCount) || 0,
+        color: isHexColor(day.color) ? day.color.trim() : null,
+        contributionLevel: day.contributionLevel || 'NONE',
+        weekday: Number.isFinite(Number(day.weekday)) ? Number(day.weekday) : null,
       })),
     })),
   };
@@ -274,8 +329,6 @@ async function fetchContributions(username, token) {
     };
   }
 
-  const from = new Date(Date.now() - 364 * 86400000).toISOString();
-
   let body;
   try {
     const response = await githubFetch(
@@ -283,7 +336,7 @@ async function fetchContributions(username, token) {
       {
         method: 'POST',
         accept: 'application/json',
-        body: JSON.stringify({ query: CONTRIBUTIONS_QUERY, variables: { login: username, from } }),
+        body: JSON.stringify({ query: CONTRIBUTIONS_QUERY, variables: { login: username } }),
       },
       token
     );
@@ -308,12 +361,8 @@ async function fetchContributions(username, token) {
     };
   }
 
-  const summary = summariseWeeks(calendar.weeks);
   return {
-    contributions: {
-      ...summary,
-      totalLastYear: Number(calendar.totalContributions) || summary.totalLastYear,
-    },
+    contributions: summariseWeeks(calendar),
     contributionsUnavailableReason: null,
     contributionsNotice: null,
   };
@@ -462,6 +511,13 @@ function toErrorResponse(error) {
 }
 
 function registerGitHubRoutes(app) {
+  const handleFailure = (request, response, error) => {
+    const failure = toErrorResponse(error);
+    const code = error instanceof GitHubError ? error.code : 'internal-error';
+    console.error(`[github] ${request.method} ${request.originalUrl} failed (${code}, HTTP ${failure.status}): ${error.message}`);
+    response.status(failure.status).json(failure.body);
+  };
+
   app.get('/api/github', async (request, response) => {
     try {
       response.set('Cache-Control', 'public, max-age=60');
@@ -478,10 +534,44 @@ function registerGitHubRoutes(app) {
 
       response.json(payload);
     } catch (error) {
-      const failure = toErrorResponse(error);
-      const code = error instanceof GitHubError ? error.code : 'internal-error';
-      console.error(`[github] ${request.method} ${request.originalUrl} failed (${code}, HTTP ${failure.status}): ${error.message}`);
-      response.status(failure.status).json(failure.body);
+      handleFailure(request, response, error);
+    }
+  });
+
+  /**
+   * Contribution calendar only, for clients that just need the grid.
+   *
+   * It reads through the same cache as /api/github, so asking for both costs
+   * one upstream GraphQL call and never an extra one. Nothing is recomputed or
+   * re-fetched here, and the token is still only ever sent to api.github.com.
+   */
+  app.get('/api/github/contributions', async (request, response) => {
+    try {
+      const payload = await getGitHubActivity();
+
+      if (!payload.contributions) {
+        response.set('Cache-Control', 'no-store');
+        return response.status(503).json({
+          ok: false,
+          error: {
+            code: payload.contributionsUnavailableReason || 'contributions-unavailable',
+            message:
+              payload.contributionsNotice ||
+              'GitHub contribution data is temporarily unavailable.',
+          },
+        });
+      }
+
+      response.set('Cache-Control', 'public, max-age=60');
+      return response.json({
+        ok: true,
+        source: 'github',
+        username: payload.profile?.username || null,
+        ...payload.contributions,
+        meta: payload.meta,
+      });
+    } catch (error) {
+      return handleFailure(request, response, error);
     }
   });
 }

@@ -396,18 +396,25 @@
           <article class="gh-panel gh-calendar-panel">
             <header class="gh-panel-head">
               <h3><i data-lucide="calendar-days"></i> Contribution calendar</h3>
-              <div class="gh-legend" aria-hidden="true"><span>Less</span><i class="gh-cell" data-level="0"></i><i class="gh-cell" data-level="1"></i><i class="gh-cell" data-level="2"></i><i class="gh-cell" data-level="3"></i><i class="gh-cell" data-level="4"></i><span>More</span></div>
+              <div class="gh-legend" aria-hidden="true"><span>Less</span><i class="gh-cell" data-gh-legend-swatch data-level="0"></i><i class="gh-cell" data-gh-legend-swatch data-level="1"></i><i class="gh-cell" data-gh-legend-swatch data-level="2"></i><i class="gh-cell" data-gh-legend-swatch data-level="3"></i><i class="gh-cell" data-gh-legend-swatch data-level="4"></i><span>More</span></div>
             </header>
             <div class="gh-calendar-scroll">
-              <div class="gh-calendar" data-gh-calendar role="grid" aria-label="Daily contribution counts for the last 12 months"></div>
+              <div class="gh-calendar-wrap" data-gh-calendar-wrap>
+                <div class="gh-calendar-months" data-gh-calendar-months aria-hidden="true"></div>
+                <div class="gh-calendar" data-gh-calendar role="grid" aria-label="Daily contribution counts for the last 12 months"></div>
+              </div>
             </div>
-            <p class="gh-panel-foot gh-hint" data-gh-calendar-hint>Hover a square for the daily count, or focus the grid and use the arrow keys.</p>
+            <div class="gh-calendar-foot">
+              <p class="gh-panel-foot gh-hint" data-gh-calendar-hint>Hover a square for the daily count, or focus the grid and use the arrow keys.</p>
+              <p class="gh-calendar-total" data-gh-calendar-total></p>
+            </div>
             <div class="gh-unavailable" data-gh-contributions-unavailable hidden>
               <i data-lucide="calendar-off"></i>
               <div>
                 <strong>Contribution data unavailable</strong>
                 <span data-gh-contributions-notice></span>
               </div>
+              <button class="button button-quiet gh-retry" type="button" data-gh-contributions-retry><span>Retry</span><i data-lucide="refresh-cw"></i></button>
             </div>
           </article>
 
@@ -423,7 +430,7 @@
 
     <section class="contact-section" id="contact"><div class="container contact-grid"><div class="contact-copy reveal"><p class="eyebrow">07 / Say hello</p><h2>Have an idea?<br /><em>Let’s build it.</em></h2><p>Whether it’s a project, a collaboration, or just a good conversation about technology, my inbox is open.</p><a class="email-link" href="mailto:prajwalpradhan009@gmail.com">prajwalpradhan009@gmail.com <i data-lucide="arrow-up-right"></i></a></div><form class="contact-form reveal reveal-delay"><label>Your name<input type="text" placeholder="Jane Doe" required /></label><label>Email address<input type="email" placeholder="jane@example.com" required /></label><label>Tell me about it<textarea placeholder="A little about your idea..." rows="4" required></textarea></label><button class="button button-primary" type="submit">Send message <i data-lucide="send"></i></button><p class="form-message" aria-live="polite"></p></form></div></section>
   </main>
-  <footer class="footer container"><span>© 2025 Prajjwal Pradhan</span><span>Designed & built with intention.</i></a></footer>
+  <footer class="footer container reveal"><span>© 2025 Prajjwal Pradhan</span><span>Designed & built with intention.</i></a></footer>
 
   <!-- Prajwal AI — portfolio assistant. Markup only: chat.js owns the behaviour. -->
   <div class="ai-root" data-ai-root>

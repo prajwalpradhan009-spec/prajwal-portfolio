@@ -7,7 +7,7 @@ A fast, responsive developer portfolio built with plain HTML, CSS and JavaScript
 - Fully responsive single page: Hero, About, Skills, Education, Projects, GitHub Activity, Services, Contact
 - Light / dark themes (persisted) with an animated header and scroll progress bar
 - Mobile navigation menu and touch-optimized interactions (no label taps, no sticky hover)
-- **Live GitHub Activity dashboard** — public repos, stars, forks, followers, a 12-month contribution graph and a 53-week contribution calendar, all fetched from the real GitHub API on every visit
+- **Live GitHub Activity dashboard** — public repos, stars, forks, followers, a 12-month contribution graph and a 53-week contribution calendar, all read live from the real GitHub API on every visit
 - Project showcase with custom artwork and animations:
   - **Northstar File Studio** — featured, PDF/image desktop utility
   - **NovaCart** — E-commerce store, marked "Project In Progress"
@@ -100,6 +100,7 @@ Open [http://127.0.0.1:3000](http://127.0.0.1:3000) to use the portfolio through
 | `GET`  | `/api/projects/:slug` | Returns one project by slug                       |
 | `GET`  | `/api/skills`         | Returns skills grouped by category                |
 | `GET`  | `/api/github`         | Returns verified live GitHub data (see below)     |
+| `GET`  | `/api/github/contributions` | Returns the contribution calendar only       |
 | `POST` | `/api/contact`        | Validates and stores a contact message            |
 
 Example contact request:
@@ -124,17 +125,38 @@ nothing is hard-coded, estimated or filled in with placeholders.
   "profile": { "username": "…", "name": "…", "avatarUrl": "…", "profileUrl": "…", "bio": "…", "location": "…", "followers": 0, "following": 0 },
   "stats": { "publicRepos": 3, "totalStars": 3, "totalForks": 0, "followers": 0, "following": 0, "totalsComplete": true },
   "repositories": [ { "name": "…", "url": "…", "language": "…", "stars": 1, "forks": 0, "topics": [], "isFork": false, "isArchived": false, "updatedAt": "…" } ],
-  "contributions": { "totalLastYear": 49, "totalLast30Days": 29, "totalLast7Days": 9, "activeDays": 19, "currentStreak": 0, "longestStreak": 4, "weeks": [ /* 53 weeks of days */ ] },
+  "contributions": {
+    "totalContributions": 75,
+    "totalLast30Days": 29,
+    "totalLast7Days": 9,
+    "activeDays": 26,
+    "currentStreak": 0,
+    "longestStreak": 4,
+    "legend": [ { "level": 0, "name": "NONE", "color": "#ebedf0" }, { "level": 1, "name": "FIRST_QUARTILE", "color": "#9be9a8" } ],
+    "weeks": [
+      {
+        "firstDay": "2025-09-28",
+        "contributionDays": [ { "date": "2025-09-28", "contributionCount": 0, "color": "#ebedf0", "contributionLevel": "NONE", "weekday": 0 } ]
+      }
+    ]
+  },
   "contributionsUnavailableReason": null,
   "meta": { "fetchedAt": "…", "cacheTtlSeconds": 600, "fromCache": false, "stale": false }
 }
 ```
 
+`GET /api/github/contributions` returns the `contributions` object on its own
+(plus `username`), reading through the same cache, so calling both endpoints
+costs a single upstream GraphQL request. It answers `503` with a structured
+error when no calendar is available.
+
 How it behaves:
 
 - **Automatic updates.** The frontend requests `/api/github` on load, then re-checks shortly after the server cache expires. The server caches a verified response for `GITHUB_CACHE_MINUTES` (default 10) and collapses concurrent requests into a single upstream call.
 - **Graceful degradation.** If GitHub is unreachable or rate limited, the last verified response is served with `meta.stale: true` and the dashboard labels itself "Last verified …". If nothing has ever been cached, the endpoint returns a structured error and the section shows a clean error state with a retry button.
-- **Contribution data is never faked.** The contribution calendar comes from GitHub's official GraphQL API, which requires authentication. Without a valid `GITHUB_TOKEN`, `contributions` is `null`, `contributionsUnavailableReason` explains why, and the section shows a "Contribution data unavailable" panel instead of a chart.
+- **The calendar is GitHub's, verbatim.** The query asks for `contributionCalendar { totalContributions weeks { contributionDays { contributionCount date color contributionLevel weekday } } }` and each square is rendered from the day GitHub returned, at the column for its week and the row for its weekday, painted with the `color` GitHub chose. No day is padded, reordered, filled in or estimated, which is why a quiet year legitimately shows many empty squares.
+- **GitHub's own range.** The query passes no `from`/`to`, so GitHub returns the same 52–53 week window it renders on github.com, ending today. Passing `from` explicitly makes GitHub pad the first and last weeks out to full week boundaries, which would add squares for future days that can only ever be zero.
+- **Contribution data is never faked.** Contribution history comes from GitHub's official GraphQL API, which requires authentication. Without a valid `GITHUB_TOKEN`, `contributions` is `null`, `contributionsUnavailableReason` explains why, and the section shows a "Contribution data unavailable" panel with a retry button instead of a chart.
 - **No secret in the response.** The token is only ever sent from the server to `api.github.com`; it is never included in any API response, log line, or frontend file.
 
 ## Mobile & Touch
@@ -143,7 +165,7 @@ How it behaves:
 - `-webkit-tap-highlight-color: transparent` removes the tap flash on iOS
 - Hover-only effects (card lifts, borders) are disabled on touch devices via `@media (hover: none)`
 - Reduced-motion users get all animations and transitions switched off
-- The contribution chart and calendar scroll horizontally on narrow screens instead of shrinking into unreadable squares
+- The contribution chart and calendar scroll horizontally on narrow screens instead of shrinking into unreadable squares, and every square keeps a 1:1 aspect ratio
 
 ## Deployment
 

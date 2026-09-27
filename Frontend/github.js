@@ -31,9 +31,14 @@
     chartNote: section.querySelector('[data-gh-chart-note]'),
     chartFoot: section.querySelector('[data-gh-chart-foot]'),
     calendar: section.querySelector('[data-gh-calendar]'),
+    calendarWrap: section.querySelector('[data-gh-calendar-wrap]'),
+    calendarMonths: section.querySelector('[data-gh-calendar-months]'),
+    calendarTotal: section.querySelector('[data-gh-calendar-total]'),
     calendarHint: section.querySelector('[data-gh-calendar-hint]'),
+    legend: section.querySelector('.gh-legend'),
     contributionsUnavailable: section.querySelector('[data-gh-contributions-unavailable]'),
     contributionsNotice: section.querySelector('[data-gh-contributions-notice]'),
+    contributionsRetry: section.querySelector('[data-gh-contributions-retry]'),
     repos: section.querySelector('[data-gh-repos]'),
     reposEmpty: section.querySelector('[data-gh-repos-empty]'),
     reposNote: section.querySelector('[data-gh-repos-note]'),
@@ -79,6 +84,17 @@
     'user-not-found': 'GitHub could not find an account matching the configured username.',
   };
 
+  // GitHub's own contributionLevel enum, in the order of its colour scale.
+  // Only used to pick a legend step; the square colour itself is whatever
+  // GitHub returned for that day.
+  const LEVEL_INDEX = {
+    NONE: 0,
+    FIRST_QUARTILE: 1,
+    SECOND_QUARTILE: 2,
+    THIRD_QUARTILE: 3,
+    FOURTH_QUARTILE: 4,
+  };
+
   /* ---------------------------------------------------------------- utils */
 
   function createElement(tag, className, text) {
@@ -110,6 +126,18 @@
     const date = new Date(`${iso}T00:00:00`);
     if (Number.isNaN(date.getTime())) return String(iso);
     return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  // Long form used for the calendar tooltip and screen-reader labels, e.g.
+  // "September 25, 2026".
+  function formatDateLong(iso) {
+    const date = new Date(`${iso}T00:00:00`);
+    if (Number.isNaN(date.getTime())) return String(iso);
+    return date.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function contributionPhrase(count) {
+    return `${numberFormat.format(count)} contribution${count === 1 ? '' : 's'}`;
   }
 
   function formatRelative(value) {
@@ -172,9 +200,9 @@
     if (!Array.isArray(weeks) || !weeks.length) return [];
     const buckets = new Map();
     weeks.forEach(week => {
-      (week.days || []).forEach(day => {
+      (week.contributionDays || []).forEach(day => {
         const month = String(day.date).slice(0, 7);
-        buckets.set(month, (buckets.get(month) || 0) + (Number(day.count) || 0));
+        buckets.set(month, (buckets.get(month) || 0) + (Number(day.contributionCount) || 0));
       });
     });
     return [...buckets.entries()]
@@ -329,19 +357,90 @@
     if (tooltip) tooltip.classList.remove('is-visible');
   }
 
+  /** "September 25, 2026: 4 contributions" — used for tooltips and aria-labels. */
   function describeCell(cell) {
     const count = Number(cell.dataset.count) || 0;
-    return `${count} contribution${count === 1 ? '' : 's'} on ${formatDate(cell.dataset.date)}`;
+    return `${formatDateLong(cell.dataset.date)}: ${contributionPhrase(count)}`;
   }
 
-  function weekdayOf(iso) {
-    const date = new Date(`${iso}T00:00:00`);
+  // GitHub sends the weekday with every day, so it is preferred over deriving
+  // one. The local date is only a fallback for the improbable case that a
+  // response omits the field.
+  function weekdayOf(day) {
+    const sent = Number(day.weekday);
+    if (Number.isInteger(sent) && sent >= 0 && sent <= 6) return sent;
+    const date = new Date(`${day.date}T00:00:00`);
     return Number.isNaN(date.getTime()) ? 0 : date.getDay();
   }
 
+  const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  /**
+   * A month label belongs to the first week column that contains a day of that
+   * month, which is how GitHub's own calendar is aligned.
+   *
+   * A label is skipped when the previous one is less than two columns away,
+   * because a three-character month name cannot fit in a single column without
+   * printing on top of its neighbour. That only happens for the month that
+   * opens the window, which starts a few days before the calendar does.
+   */
+  function renderMonthLabels(weeks) {
+    if (!el.calendarMonths) return;
+    const fragment = document.createDocumentFragment();
+    const MIN_LABEL_GAP = 2;
+    let previousColumn = -Infinity;
+    let previousMonth = null;
+
+    weeks.forEach((week, weekIndex) => {
+      const first = week.contributionDays[0];
+      if (!first) return;
+      const month = String(first.date).slice(0, 7);
+      if (month === previousMonth) return;
+      previousMonth = month;
+      if (weekIndex - previousColumn < MIN_LABEL_GAP) return;
+      previousColumn = weekIndex;
+
+      const [year, monthNumber] = month.split('-').map(Number);
+      const date = new Date(year, monthNumber - 1, 1);
+      const label = createElement('span', null, MONTH_LABELS[monthNumber - 1] || date.toLocaleDateString(undefined, { month: 'short' }));
+      label.style.gridColumn = String(weekIndex + 1);
+      label.title = date.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+      fragment.append(label);
+    });
+
+    el.calendarMonths.replaceChildren(fragment);
+  }
+
+  /** Paints the Less/More legend with the colours GitHub returned for the calendar. */
+  function renderLegend(legend) {
+    if (!el.legend || !Array.isArray(legend)) return;
+    el.legend.querySelectorAll('[data-gh-legend-swatch]').forEach(swatch => {
+      const entry = legend[Number(swatch.dataset.level)];
+      const color = entry?.color;
+      if (typeof color !== 'string' || !color) {
+        swatch.removeAttribute('style');
+        return;
+      }
+      // Only the custom property is set, never `background`, so the stylesheet
+      // composes the empty step exactly as it composes the matching squares and
+      // the legend reads the same as the grid above it.
+      swatch.style.setProperty('--gh-day-color', color);
+      swatch.title = entry.name ? entry.name.replace(/_/g, ' ').toLowerCase() : '';
+    });
+  }
+
+  /**
+   * Renders contributionCalendar.weeks exactly as GitHub returned them: one
+   * grid cell per contributionDays entry, at the column for its week and the
+   * row for its weekday, painted with the colour GitHub chose for that day.
+   * No cell is padded, reordered or filled in — a day GitHub reported as 0 is
+   * GitHub's own empty square.
+   */
   function renderCalendar(contributions) {
     el.calendar.replaceChildren();
-    const weeks = Array.isArray(contributions?.weeks) ? contributions.weeks.filter(week => week?.days?.length) : [];
+    const weeks = Array.isArray(contributions?.weeks)
+      ? contributions.weeks.filter(week => Array.isArray(week?.contributionDays) && week.contributionDays.length)
+      : [];
     if (!weeks.length) return;
 
     // Weeks at the edges of the range can be partial, so every cell is placed
@@ -353,13 +452,17 @@
     weeks.forEach((week, weekIndex) => {
       const row = createElement('div', 'gh-cal-row');
       row.setAttribute('role', 'row');
-      week.days.forEach(day => {
-        const weekday = weekdayOf(day.date);
+      week.contributionDays.forEach(day => {
+        const weekday = weekdayOf(day);
+        const count = Number(day.contributionCount) || 0;
         const cell = createElement('span', 'gh-cell');
         cell.setAttribute('role', 'gridcell');
-        cell.dataset.level = String(Math.min(Math.max(Number(day.level) || 0, 0), 4));
-        cell.dataset.count = String(Number(day.count) || 0);
+        cell.dataset.level = String(Number.isInteger(LEVEL_INDEX[day.contributionLevel]) ? LEVEL_INDEX[day.contributionLevel] : 0);
+        cell.dataset.count = String(count);
         cell.dataset.date = String(day.date);
+        if (typeof day.color === 'string' && /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(day.color.trim())) {
+          cell.style.setProperty('--gh-day-color', day.color.trim());
+        }
         cell.style.gridArea = `${weekday + 1} / ${weekIndex + 1}`;
         cell.tabIndex = -1;
         cell.setAttribute('aria-label', describeCell(cell));
@@ -371,7 +474,11 @@
     });
 
     el.calendar.append(fragment);
-    el.calendar.style.setProperty('--gh-weeks', String(weeks.length));
+    // Set on the wrapper so the month-label grid and the day grid resolve the
+    // same column template and stay column-aligned.
+    if (el.calendarWrap) el.calendarWrap.style.setProperty('--gh-weeks', String(weeks.length));
+    else el.calendar.style.setProperty('--gh-weeks', String(weeks.length));
+    renderMonthLabels(weeks);
 
     // Roving tabindex: one cell is reachable by Tab, arrows move within the grid.
     const last = cells[cells.length - 1];
@@ -489,8 +596,10 @@
       el.contributionsUnavailable.hidden = false;
       el.calendarHint.hidden = true;
       el.contributionsNotice.textContent =
-        CONTRIBUTION_UNAVAILABLE_COPY[data.contributionsUnavailableReason] ||
-        'GitHub did not return contribution history for this account, so nothing is displayed here.';
+        `${CONTRIBUTION_UNAVAILABLE_COPY[data.contributionsUnavailableReason] ||
+          'GitHub did not return contribution history for this account.'} GitHub contribution data is temporarily unavailable.`;
+      el.calendarTotal.textContent = '';
+      el.calendarMonths?.replaceChildren();
       el.chart.replaceChildren(createElement('p', 'gh-chart-empty', 'Activity graph unavailable for this period.'));
       el.chartNote.textContent = 'Contribution data unavailable';
       el.chartFoot.textContent = '';
@@ -500,8 +609,18 @@
 
     el.contributionsUnavailable.hidden = true;
     el.calendarHint.hidden = false;
+    renderLegend(contributions.legend);
     renderChart(contributions);
     renderCalendar(contributions);
+
+    // Straight from contributionCalendar.totalContributions.
+    const total = Number(contributions.totalContributions);
+    if (Number.isFinite(total)) {
+      const strong = createElement('strong', null, numberFormat.format(total));
+      el.calendarTotal.replaceChildren(strong, document.createTextNode(` ${total === 1 ? 'contribution' : 'contributions'} in the last year`));
+    } else {
+      el.calendarTotal.textContent = '';
+    }
   }
 
   function render(data) {
@@ -529,7 +648,7 @@
     // owner's private repositories too, which must never be linked from here.
     if (profile.username) el.reposLink.href = `https://github.com/${encodeURIComponent(profile.username)}?tab=repositories&visibility=public&sort=stargazers`;
 
-    setStat('contributions', data.contributions ? data.contributions.totalLastYear : null);
+    setStat('contributions', data.contributions ? data.contributions.totalContributions : null);
     setStat('publicRepos', stats.publicRepos ?? null);
     setStat('totalStars', stats.totalStars ?? null);
     setStat('totalForks', stats.totalForks ?? null);
@@ -610,6 +729,7 @@
   }
 
   el.retry.addEventListener('click', () => load());
+  el.contributionsRetry?.addEventListener('click', () => load());
 
   document.addEventListener('visibilitychange', () => {
     if (document.hidden || !latest?.meta?.fetchedAt) return;
