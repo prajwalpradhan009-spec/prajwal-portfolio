@@ -70,6 +70,9 @@ app.use(cors(allowedOrigins.length ? { origin: allowedOrigins } : {}));
 registerChatRoutes(app);
 
 app.use(express.json({ limit: '16kb' }));
+app.get('/prajwal-pradhan', (request, response) => {
+  response.sendFile(path.join(__dirname, '..', 'Frontend', 'prajwal-pradhan.html'));
+});
 app.use(express.static(path.join(__dirname, '..', 'Frontend')));
 
 const projects = [
