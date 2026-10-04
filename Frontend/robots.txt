@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://prajwal-portfolio-sxgf.onrender.com/sitemap.xml
