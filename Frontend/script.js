@@ -69,6 +69,7 @@ const header = document.querySelector('.site-header');
 const menuToggle = document.querySelector('.menu-toggle');
 const navLinks = document.querySelector('.nav-links');
 const navAnchors = document.querySelectorAll('.nav-links a:not(.resume-link)');
+const trackScrollProgress = window.matchMedia('(min-width: 851px) and (hover: hover) and (pointer: fine)');
 
 // Scroll work used to run on every scroll event and re-read the offset of every
 // section each time. Those offsetTop/offsetHeight reads force a synchronous
@@ -93,13 +94,15 @@ function applyScrollState() {
     lastHeaderScrolled = isScrolled;
   }
 
+  if (!trackScrollProgress.matches) return;
+
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
   const progress = maxScroll > 0 ? Math.min(100, (y / maxScroll) * 100) : 0;
   const roundedProgress = Math.round(progress * 10) / 10;
   // Skip the style write when nothing meaningful changed: every write here
   // invalidates style for the whole document.
   if (roundedProgress !== lastScrollProgress) {
-    document.documentElement.style.setProperty('--scroll-progress', `${roundedProgress}%`);
+    document.documentElement.style.setProperty('--scroll-progress', String(roundedProgress / 100));
     lastScrollProgress = roundedProgress;
   }
 }
