@@ -10,7 +10,13 @@
  */
 
 const express = require('express');
-const { generateReply, isGeminiConfigured, scrubSecrets, GeminiError } = require('./gemini');
+const {
+  generateReply,
+  isGeminiConfigured,
+  getConfiguredModel,
+  scrubSecrets,
+  GeminiError,
+} = require('./gemini');
 const { createRateLimiter } = require('./rateLimit');
 
 const MAX_MESSAGE_LENGTH = 2000;
@@ -171,4 +177,5 @@ function registerChatRoutes(app) {
 module.exports = {
   registerChatRoutes,
   isGeminiConfigured,
+  getConfiguredModel,
 };

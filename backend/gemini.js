@@ -14,9 +14,13 @@
 
 const { GoogleGenAI } = require('@google/genai');
 
-// Pinned to gemini-1.5-flash. Setting GEMINI_MODEL overrides this; leaving it
-// blank falls back to the value here.
-const DEFAULT_MODEL = 'gemini-1.5-flash';
+// Pinned to gemini-3.8-flash, the current fast model. Setting GEMINI_MODEL
+// overrides this; leaving it blank falls back to the value here.
+//
+// Older pins such as gemini-1.5-flash, gemini-2.0-flash and gemini-2.5-flash
+// have all been retired by Google and now answer 404, so the default has to
+// track the current model rather than an old one.
+const DEFAULT_MODEL = 'gemini-3.8-flash';
 
 const REQUEST_TIMEOUT_MS = 20000;
 const MAX_OUTPUT_TOKENS = 800;
@@ -78,10 +82,28 @@ class GeminiError extends Error {
 let cachedClient = null;
 let cachedApiKey = null;
 
+/**
+ * Canonicalises a model name from the environment.
+ *
+ * Model names are hyphen separated, so the two mistakes people actually make in
+ * `GEMINI_MODEL` are a space or an underscore instead of a hyphen
+ * ("gemini-1.5 flash"). Google rejects those outright with HTTP 400 "unexpected
+ * model name format", which otherwise looks like a broken API key. Repairing
+ * the separators here means such a value still reaches a model instead of
+ * breaking the assistant, and anything that cannot be a model name at all falls
+ * back to the pinned default rather than failing every request.
+ */
+function normaliseModel(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return DEFAULT_MODEL;
+  const collapsed = raw.toLowerCase().replace(/[\s_]+/g, '-').replace(/-{2,}/g, '-').replace(/^-+|-+$/g, '');
+  return /^gemini-[a-z0-9.-]+$/.test(collapsed) ? collapsed : DEFAULT_MODEL;
+}
+
 function readConfig() {
   return {
     apiKey: String(process.env.GEMINI_API_KEY || '').trim(),
-    model: String(process.env.GEMINI_MODEL || '').trim() || DEFAULT_MODEL,
+    model: normaliseModel(process.env.GEMINI_MODEL),
   };
 }
 
@@ -253,4 +275,10 @@ async function generateReply({ message, history = [] }) {
   return reply;
 }
 
-module.exports = { generateReply, isGeminiConfigured, scrubSecrets, GeminiError };
+module.exports = {
+  generateReply,
+  isGeminiConfigured,
+  getConfiguredModel: () => readConfig().model,
+  scrubSecrets,
+  GeminiError,
+};

@@ -6,7 +6,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose'); // Added Mongoose
 const { registerGitHubRoutes } = require('./github');
-const { registerChatRoutes, isGeminiConfigured } = require('./chat');
+const { registerChatRoutes, isGeminiConfigured, getConfiguredModel } = require('./chat');
 
 // Loads variables from .env file
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -182,7 +182,7 @@ async function startServer() {
   }
 
   if (isGeminiConfigured()) {
-    console.log(`Prajwal AI enabled (model: ${String(process.env.GEMINI_MODEL || '').trim() || 'gemini-1.5-flash'}).`);
+    console.log(`Prajwal AI enabled (model: ${getConfiguredModel()}).`);
   } else {
     console.warn(`GEMINI_API_KEY is not set, so /api/chat will report that Prajwal AI is unavailable. ${CONFIG_HINT}`);
   }
