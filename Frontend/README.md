@@ -12,7 +12,12 @@ This is a fast, dependency-free portfolio front end. Open `index.html` directly 
 | `script.js`    | Navigation, theme toggle, project cards, contact form          |
 | `github.js`    | GitHub dashboard: fetch, loading/error/empty states, chart      |
 | `config.js`    | Optional API base URL override                                  |
+| `cyber-cursor.js` / `cyber-cursor.css` | Desktop cyber cursor, particle trail and interaction states |
 | `resume.html`  | Standalone resume page                                          |
+
+The cyber cursor is enabled only for fine-pointer devices when reduced motion
+is not requested. Touch devices and visitors who prefer reduced motion retain
+the browser cursor and the page's existing interactions.
 
 ## Add the portrait logo
 
