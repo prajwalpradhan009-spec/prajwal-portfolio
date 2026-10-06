@@ -63,11 +63,11 @@
       particles: [],
       trail: [],
     };
-    const maxParticles = 72;
+    const maxParticles = 48;
     const particleColors = ['105, 229, 225', '91, 255, 190'];
 
     function resizeCanvas() {
-      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.25);
       canvas.width = Math.round(window.innerWidth * pixelRatio);
       canvas.height = Math.round(window.innerHeight * pixelRatio);
       canvas.style.width = `${window.innerWidth}px`;
@@ -140,10 +140,10 @@
       const targetY = state.pointerY + state.magnetOffsetY;
       const dx = targetX - state.cursorX;
       const dy = targetY - state.cursorY;
-      state.cursorX += dx * 0.34;
-      state.cursorY += dy * 0.34;
-      state.hudX += (targetX - state.hudX) * 0.19;
-      state.hudY += (targetY - state.hudY) * 0.19;
+      state.cursorX += dx * 0.72;
+      state.cursorY += dy * 0.72;
+      state.hudX += (targetX - state.hudX) * 0.34;
+      state.hudY += (targetY - state.hudY) * 0.34;
 
       cursor.style.transform = `translate3d(${state.cursorX}px, ${state.cursorY}px, 0)`;
       cursor.style.setProperty('--cyber-hud-x', `${state.hudX - state.cursorX}px`);
