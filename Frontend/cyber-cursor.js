@@ -44,8 +44,6 @@
     const state = {
       pointerX: -100,
       pointerY: -100,
-      cursorX: -100,
-      cursorY: -100,
       hudX: -100,
       hudY: -100,
       previousX: -100,
@@ -59,11 +57,11 @@
       particles: [],
       trail: [],
     };
-    const maxParticles = 48;
+    const maxParticles = 32;
     const particleColors = ['105, 229, 225', '91, 255, 190'];
 
     function resizeCanvas() {
-      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.25);
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1);
       canvas.width = Math.round(window.innerWidth * pixelRatio);
       canvas.height = Math.round(window.innerHeight * pixelRatio);
       canvas.style.width = `${window.innerWidth}px`;
@@ -134,16 +132,11 @@
       state.frame = 0;
       const targetX = state.pointerX + state.magnetOffsetX;
       const targetY = state.pointerY + state.magnetOffsetY;
-      const dx = targetX - state.cursorX;
-      const dy = targetY - state.cursorY;
-      state.cursorX += dx * 0.72;
-      state.cursorY += dy * 0.72;
       state.hudX += (targetX - state.hudX) * 0.34;
       state.hudY += (targetY - state.hudY) * 0.34;
 
-      cursor.style.transform = `translate3d(${state.cursorX}px, ${state.cursorY}px, 0)`;
-      cursor.style.setProperty('--cyber-hud-x', `${state.hudX - state.cursorX}px`);
-      cursor.style.setProperty('--cyber-hud-y', `${state.hudY - state.cursorY}px`);
+      cursor.style.setProperty('--cyber-hud-x', `${state.hudX - state.pointerX}px`);
+      cursor.style.setProperty('--cyber-hud-y', `${state.hudY - state.pointerY}px`);
 
       const width = window.innerWidth;
       const height = window.innerHeight;
@@ -161,12 +154,9 @@
         context.strokeStyle = `rgba(${particleColors[to.color]}, ${Math.max(0, 1 - age / 260) * Math.min(0.72, to.speed / 2)})`;
         context.lineWidth = Math.max(1, Math.min(4, to.speed * 1.2));
         context.lineCap = 'round';
-        context.shadowColor = `rgba(${particleColors[to.color]}, .9)`;
-        context.shadowBlur = 12;
         context.stroke();
       }
 
-      context.shadowBlur = 0;
       state.particles = state.particles.filter(particle => {
         const age = now - particle.born;
         if (age >= particle.life) return false;
@@ -179,22 +169,13 @@
         const opacity = 1 - progress;
         const size = particle.radius * (1 - progress * 0.55);
 
-        context.save();
-        context.translate(particle.x, particle.y);
-        context.rotate(progress * 1.8);
         context.fillStyle = `rgba(${particle.color}, ${opacity})`;
-        context.shadowColor = `rgba(${particle.color}, ${opacity})`;
-        context.shadowBlur = particle.radius * 4;
-        context.fillRect(-size / 2, -size / 2, size, size);
-        context.restore();
+        context.fillRect(particle.x - size / 2, particle.y - size / 2, size, size);
         return true;
       });
 
       context.globalCompositeOperation = 'source-over';
-      context.shadowBlur = 0;
       const pointerStillFollowing =
-        Math.abs(targetX - state.cursorX) > 0.08 ||
-        Math.abs(targetY - state.cursorY) > 0.08 ||
         Math.abs(targetX - state.hudX) > 0.08 ||
         Math.abs(targetY - state.hudY) > 0.08;
       if (pointerStillFollowing || state.particles.length || state.trail.length) requestFrame();
@@ -212,10 +193,11 @@
       state.pointerY = event.clientY;
 
       if (!state.visible) {
-        state.cursorX = state.hudX = state.pointerX;
-        state.cursorY = state.hudY = state.pointerY;
+        state.hudX = state.pointerX;
+        state.hudY = state.pointerY;
       }
       state.visible = true;
+      cursor.style.transform = `translate3d(${state.pointerX}px, ${state.pointerY}px, 0)`;
       cursor.classList.add('is-visible');
       updateHover(event.target);
       [state.magnetOffsetX, state.magnetOffsetY] = getMagnetOffset(
@@ -227,7 +209,7 @@
       if (distance > 2) {
         const color = Math.random() < 0.38 ? 1 : 0;
         state.trail.push({ x: state.pointerX, y: state.pointerY, time: now, speed, color });
-        if (state.trail.length > 15) state.trail.shift();
+        if (state.trail.length > 10) state.trail.shift();
 
         if (distance > 4) {
           const count = speed > 1.5 ? 2 : 1;
