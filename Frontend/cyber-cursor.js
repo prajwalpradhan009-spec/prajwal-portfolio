@@ -26,10 +26,6 @@
         <path d="m5.2 6.1 8.7 8.2-4.1.5-2.4 4.2L5.2 6.1Z" fill="currentColor" opacity=".28"/>
       </svg>
       <span class="cyber-cursor__hud">
-        <i class="cyber-cursor__ring cyber-cursor__ring--ticks"></i>
-        <i class="cyber-cursor__ring cyber-cursor__ring--outer"></i>
-        <i class="cyber-cursor__ring cyber-cursor__ring--middle"></i>
-        <i class="cyber-cursor__ring cyber-cursor__ring--inner"></i>
         <span class="cyber-cursor__indicator" aria-hidden="true">↗</span>
       </span>
     `;

@@ -58,65 +58,6 @@ html.cyber-cursor-enabled * {
   transition: scale 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.cyber-cursor__ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  display: block;
-  border: 1px solid rgba(105, 229, 225, 0.58);
-  border-radius: 50%;
-  box-shadow: 0 0 7px rgba(105, 229, 225, 0.2), inset 0 0 7px rgba(105, 229, 225, 0.08);
-  transform: translate(-50%, -50%);
-}
-
-.cyber-cursor__ring--outer {
-  width: 48px;
-  height: 48px;
-  border-color: rgba(105, 229, 225, 0.58);
-  border-right-color: transparent;
-  animation: cyber-cursor-spin 5.4s linear infinite;
-}
-
-.cyber-cursor__ring--middle {
-  width: 39px;
-  height: 39px;
-  border-color: rgba(91, 255, 190, 0.45);
-  border-left-color: transparent;
-  animation: cyber-cursor-spin 3.6s linear infinite reverse;
-}
-
-.cyber-cursor__ring--inner {
-  width: 30px;
-  height: 30px;
-  border-style: dashed;
-  border-color: rgba(105, 229, 225, 0.3);
-  animation: cyber-cursor-spin 8s linear infinite;
-}
-
-.cyber-cursor__ring--ticks {
-  width: 55px;
-  height: 55px;
-  border-color: transparent;
-  background: repeating-conic-gradient(
-    from 5deg,
-    rgba(105, 229, 225, 0.7) 0deg 1deg,
-    transparent 1deg 30deg
-  );
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 1px), #000 calc(100% - 0.5px));
-  mask: radial-gradient(farthest-side, transparent calc(100% - 1px), #000 calc(100% - 0.5px));
-  opacity: 0.65;
-  animation: cyber-cursor-spin 12s linear infinite reverse;
-}
-
-.cyber-cursor__hud::before {
-  position: absolute;
-  inset: 7px;
-  border: 1px solid rgba(105, 229, 225, 0.2);
-  border-radius: 50%;
-  content: "";
-  animation: cyber-cursor-idle-pulse 3.6s ease-in-out infinite;
-}
-
 .cyber-cursor__indicator {
   position: absolute;
   top: -8px;
@@ -146,17 +87,6 @@ html.cyber-cursor-enabled * {
   scale: 1.23;
 }
 
-.cyber-cursor--button .cyber-cursor__ring,
-.cyber-cursor--link .cyber-cursor__ring {
-  border-color: rgba(105, 229, 225, 0.8);
-  box-shadow: 0 0 10px rgba(105, 229, 225, 0.45), inset 0 0 8px rgba(91, 255, 190, 0.14);
-}
-
-.cyber-cursor--button .cyber-cursor__ring--outer,
-.cyber-cursor--link .cyber-cursor__ring--outer {
-  animation-duration: 3.5s;
-}
-
 .cyber-cursor--button .cyber-cursor__pointer,
 .cyber-cursor--link .cyber-cursor__pointer {
   filter: drop-shadow(0 0 6px rgba(105, 229, 225, 1))
@@ -177,55 +107,6 @@ html.cyber-cursor-enabled * {
   left: 43px;
   opacity: 1;
   transform: translate3d(0, 0, 0);
-}
-
-.cyber-cursor--image .cyber-cursor__ring--outer {
-  width: 58px;
-  height: 58px;
-  border-color: rgba(105, 229, 225, 0.72);
-  border-style: dashed;
-}
-
-.cyber-cursor--image .cyber-cursor__ring--inner {
-  width: 36px;
-  height: 36px;
-  border-style: solid;
-}
-
-.cyber-cursor.is-clicking .cyber-cursor__ring--outer {
-  border-color: #a4ffe2;
-  box-shadow: 0 0 16px rgba(105, 229, 225, 0.9);
-}
-
-.cyber-cursor.is-clicking .cyber-cursor__hud::before {
-  animation: cyber-cursor-click-pulse 560ms ease-out;
-}
-
-@keyframes cyber-cursor-spin {
-  to {
-    transform: translate(-50%, -50%) rotate(360deg);
-  }
-}
-
-@keyframes cyber-cursor-idle-pulse {
-  0%,
-  100% {
-    opacity: 0.22;
-    transform: scale(0.96);
-  }
-
-  50% {
-    opacity: 0.65;
-    transform: scale(1.04);
-  }
-}
-
-@keyframes cyber-cursor-click-pulse {
-  50% {
-    border-color: rgba(91, 255, 190, 0.9);
-    box-shadow: 0 0 18px rgba(91, 255, 190, 0.7);
-    transform: scale(1.18);
-  }
 }
 
 @keyframes cyber-cursor-ripple {
